@@ -1,0 +1,3 @@
+[submodule "third-party/surakarta-rule-ai"]
+	path = third-party/surakarta-rule-ai
+	url = https://github.com/surakarta-game/surakarta-rule-ai

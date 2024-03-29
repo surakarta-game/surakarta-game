@@ -42,7 +42,10 @@ else()
     endif()
 endif()
 
-target_link_libraries(surakarta-game PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+# use libsurakarta:
+include_directories(third-party/surakarta-rule-ai/include)
+add_subdirectory(third-party/surakarta-rule-ai ${CMAKE_BINARY_DIR}/third-party/surakarta-rule-ai/src)
+target_link_libraries(surakarta-game PRIVATE Qt${QT_VERSION_MAJOR}::Widgets surakarta)
 
 set_target_properties(surakarta-game PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
