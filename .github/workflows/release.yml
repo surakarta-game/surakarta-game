@@ -5,6 +5,7 @@ name: Compile and Release Qt6 project
 
 on:
   push:
+  workflow_dispatch:
 
 env:
   QT_VERSION:     "6.2.0"
