@@ -126,4 +126,4 @@ jobs:
         cd build
         cmake ${{github.workspace}}
         make
-        make install
+        sudo make install
