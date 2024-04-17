@@ -9,8 +9,8 @@ env:
   MINGW_PATH:     "mingw81_64"
   BUILD_TYPE:      Release
   EXECUTABLE_NAME: surakarta-game.exe
-  ARCHIVE_NAME:    surakarta-game.zip
-  RELEASE_NAME:   surakarta-game-release
+  ARCHIVE_NAME:    surakarta-game-release.zip
+  RELEASE_NAME:    surakarta-game-release
 
 jobs:
   build:
