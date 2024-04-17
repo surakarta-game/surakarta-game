@@ -8,6 +8,9 @@ env:
   MINGW_VERSION:  "win64_mingw81"
   MINGW_PATH:     "mingw81_64"
   BUILD_TYPE:      Release
+  EXECUTABLE_NAME: surakarta-game.exe
+  ARCHIVE_NAME:    surakarta-game.zip
+  ARTIFACT_NAME:   surakarta-game
 
 jobs:
   build:
@@ -84,16 +87,21 @@ jobs:
       name: Compress portable program
       run: |
         mkdir ${{github.workspace}}\build\all\
-        cp ${{github.workspace}}/build/RePr.exe ${{github.workspace}}\build\all\
+        cp ${{github.workspace}}/build/${{ env.EXECUTABLE_NAME }} ${{github.workspace}}\build\all\
         cd ${{github.workspace}}\build\all\
-        windeployqt.exe RePr.exe --release
+        windeployqt.exe ${{ env.EXECUTABLE_NAME }} --release
         ls
-        Compress-Archive -Path ${{github.workspace}}\build\all\ -DestinationPath ${{github.workspace}}\build\final.zip
+        Compress-Archive -Path ${{github.workspace}}\build\all\ -DestinationPath ${{github.workspace}}\build\${{ env.ARCHIVE_NAME }}
+    -
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.ARTIFACT_NAME }}
+        path: ${{github.workspace}}/build/${{ env.ARCHIVE_NAME }}
     -
       name: Release
       uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/')
       with:
-        files: ${{github.workspace}}/build/final.zip
+        files: ${{github.workspace}}/build/${{ env.ARCHIVE_NAME }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
