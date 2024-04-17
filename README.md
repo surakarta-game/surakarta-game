@@ -9,3 +9,7 @@ You must clone this repository recursively, because you need to download depende
 ```bash
 git clone https://github.com/surakarta-game/surakarta-game.git --recursive
 ```
+
+## Acknowledgements
+
+Our github action workflow for building for windows is based on [this](https://github.com/eyllanesc/69108420) repository. Thanks to [eyllanesc](https://github.com/eyllanesc) for sharing it!

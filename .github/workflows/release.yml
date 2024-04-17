@@ -1,3 +1,6 @@
+# From: https://github.com/eyllanesc/69108420
+# Thanks to @eyllanesc for sharing the work!
+
 name: Compile and Release Qt6 Proyect
 
 on:
