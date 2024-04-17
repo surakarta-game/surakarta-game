@@ -117,7 +117,7 @@ jobs:
         submodules: recursive
     -
       name: Install Qt6
-      run: sudo apt install qt6-base-dev
+      run: sudo apt install qt6-base-dev libglx-dev libgl1-mesa-dev
     -
       name: Build
       run: |
