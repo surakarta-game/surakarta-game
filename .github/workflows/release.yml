@@ -1,7 +1,7 @@
 # From: https://github.com/eyllanesc/69108420
 # Thanks to @eyllanesc for sharing the work!
 
-name: Compile and Release Qt6 Proyect
+name: Compile and Release Qt6 project
 
 on:
   push:
@@ -16,7 +16,7 @@ env:
   RELEASE_NAME:    surakarta-game-release
 
 jobs:
-  build:
+  Windows:
     runs-on: windows-latest
     steps:
     -
@@ -76,13 +76,13 @@ jobs:
 #        Write-Output (Get-Command mingw32-make.exe).Path
 #        mingw32-make.exe -version  
     -
-      name: Configure CMake Proyect
+      name: Configure CMake project
       working-directory: ${{github.workspace}}
       env:
         CMAKE_PREFIX_PATH: ${{env.Qt5_Dir}}
       run: cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -G "CodeBlocks - MinGW Makefiles" -B ${{github.workspace}}/build
     -
-      name: Build proyect
+      name: Build project
       working-directory: ${{github.workspace}}/build
       run: |
         mingw32-make.exe
@@ -108,3 +108,32 @@ jobs:
         files: ${{github.workspace}}/build/${{ env.ARCHIVE_NAME }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  Linux:
+    runs-on: ubuntu-latest
+    steps:
+    -
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2
+      with:
+        version:      ${{ env.QT_VERSION }}
+        host:         linux
+        target:       desktop
+        arch:         gcc_64
+        dir:          ${{ runner.temp }}
+        modules:      qtcharts qt3d
+        setup-python: false
+    -
+      name: Configure CMake project
+      working-directory: ${{github.workspace}}
+      env:
+        CMAKE_PREFIX_PATH: ${{env.Qt5_Dir}}
+      run: cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -G "CodeBlocks - MinGW Makefiles" -B ${{github.workspace}}/build
+    -
+      name: Build project
+      working-directory: ${{github.workspace}}/build
+      run: |
+        make
+        tree ..
