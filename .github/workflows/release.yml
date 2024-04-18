@@ -1,0 +1,130 @@
+# From: https://github.com/eyllanesc/69108420
+# Thanks to @eyllanesc for sharing the work!
+
+name: Compile and Release Qt6 project
+
+on:
+  push:
+  workflow_dispatch:
+
+env:
+  QT_VERSION:     "6.2.0"
+  MINGW_VERSION:  "win64_mingw81"
+  MINGW_PATH:     "mingw81_64"
+  BUILD_TYPE:      Release
+  EXECUTABLE_NAME: surakarta-game.exe
+  ARCHIVE_NAME:    surakarta-game-release.zip
+  RELEASE_NAME:    surakarta-game-release
+
+jobs:
+  Windows:
+    runs-on: windows-latest
+    steps:
+    -
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+#    -
+#      name: Check mingw g++ version
+#      run: |
+#        Write-Output (Get-Command g++.exe).Path
+#        g++.exe --version
+    -
+      name: Install correct version of mingw
+      uses: crazy-max/ghaction-chocolatey@v1
+      with:
+        args: install mingw --version=8.1.0  -y
+#    -
+#      name: Check mingw directory
+#      run: |
+#        ls C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin
+    -
+      name: Install Qt
+      uses: jurplel/install-qt-action@v2
+      with:
+        host: windows
+        target: "desktop"
+        version: ${{ env.QT_VERSION }}
+        arch: ${{ env.MINGW_VERSION }}
+        dir: "${{github.workspace}}/qt"
+        install-deps: "true"
+    -
+      name: Set Qt path and refresh
+      run: |
+        echo "${{github.workspace}}/qt/Qt/${{ env.QT_VERSION }}/${{ env.MINGW_PATH }}/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1
+        refreshenv
+        #Write-Output (Get-Command g++.exe).Path
+        #g++.exe --version
+#    -
+#      name: Check availability of libraries
+#      run: |
+#        ls ${{github.workspace}}/qt/Qt/${{ env.QT_VERSION }}/${{ env.MINGW_PATH }}/lib/
+#    -
+#      name: Check availability of binaries
+#      run: |
+#        ls ${{github.workspace}}/qt/Qt/${{ env.QT_VERSION }}/${{ env.MINGW_PATH }}/bin/
+#    -
+#      name: Prepend path
+#      run: echo ":${{github.workspace}}/qt/Qt/${{ env.QT_VERSION }}/mingw73_32/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+#    -
+#      name: Check QMake, CMake and make
+#      run: |
+#        Write-Output (Get-Command qmake.exe).Path
+#        qmake.exe -version
+#        Write-Output (Get-Command cmake.exe).Path
+#        cmake.exe -version
+#        Write-Output (Get-Command mingw32-make.exe).Path
+#        mingw32-make.exe -version  
+    -
+      name: Configure CMake project
+      working-directory: ${{github.workspace}}
+      env:
+        CMAKE_PREFIX_PATH: ${{env.Qt5_Dir}}
+      run: cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -G "CodeBlocks - MinGW Makefiles" -B ${{github.workspace}}/build
+    -
+      name: Build project
+      working-directory: ${{github.workspace}}/build
+      run: |
+        mingw32-make.exe
+    -
+      name: Compress portable program
+      run: |
+        mkdir ${{github.workspace}}\build\${{ env.RELEASE_NAME }}\
+        cp ${{github.workspace}}/build/${{ env.EXECUTABLE_NAME }} ${{github.workspace}}\build\${{ env.RELEASE_NAME }}\
+        cd ${{github.workspace}}\build\${{ env.RELEASE_NAME }}\
+        windeployqt.exe ${{ env.EXECUTABLE_NAME }} --release
+        ls
+        Compress-Archive -Path ${{github.workspace}}\build\${{ env.RELEASE_NAME }}\ -DestinationPath ${{github.workspace}}\build\${{ env.ARCHIVE_NAME }}
+    -
+      uses: actions/upload-artifact@v4
+      with:
+        name: RELEASE
+        path: ${{github.workspace}}/build/${{ env.ARCHIVE_NAME }}
+    -
+      name: Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: ${{github.workspace}}/build/${{ env.ARCHIVE_NAME }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  Linux:
+    runs-on: ubuntu-latest
+    steps:
+    -
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+    -
+      name: Install Qt6
+      run: sudo apt install qt6-base-dev libglx-dev libgl1-mesa-dev
+    -
+      name: Build
+      run: |
+        cd ..
+        mkdir build
+        cd build
+        cmake ${{github.workspace}}
+        make
+        sudo make install
