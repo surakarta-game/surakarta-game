@@ -18,6 +18,7 @@ env:
 
 jobs:
   Windows:
+    permissions: write-all
     runs-on: windows-latest
     steps:
     -
@@ -100,13 +101,13 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: RELEASE
-        path: ${{github.workspace}}/build/${{ env.ARCHIVE_NAME }}
+        path: ${{github.workspace}}\build\${{ env.ARCHIVE_NAME }}
     -
       name: Release
       uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/')
       with:
-        files: ${{github.workspace}}/build/${{ env.ARCHIVE_NAME }}
+        files: ${{github.workspace}}\build\${{ env.ARCHIVE_NAME }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   Linux:
