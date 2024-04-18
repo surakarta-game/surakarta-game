@@ -18,6 +18,7 @@ env:
 
 jobs:
   Windows:
+    permissions: write-all
     runs-on: windows-latest
     steps:
     -
