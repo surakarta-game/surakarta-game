@@ -43,8 +43,8 @@ else()
 endif()
 
 # use libsurakarta:
-include_directories(third-party/surakarta-rule-ai/include)
-add_subdirectory(third-party/surakarta-rule-ai ${CMAKE_BINARY_DIR}/third-party/surakarta-rule-ai/src)
+include_directories(third-party/surakarta-core/include)
+add_subdirectory(third-party/surakarta-core ${CMAKE_BINARY_DIR}/third-party/surakarta-core/src)
 target_link_libraries(surakarta-game PRIVATE Qt${QT_VERSION_MAJOR}::Widgets surakarta)
 
 set_target_properties(surakarta-game PROPERTIES
