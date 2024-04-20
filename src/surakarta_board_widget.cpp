@@ -122,8 +122,8 @@ void SurakartaBoardWidget::paintEvent(QPaintEvent* event) {
 }
 
 void SurakartaBoardWidget::mousePressEvent(QMouseEvent* event) {
-    int x = (event->x() - rect_corner + gap_ / 2) / gap_;
-    int y = (event->y() - rect_corner + gap_ / 2) / gap_;
+    int x = (event->pos().x() - rect_corner + gap_ / 2) / gap_;
+    int y = (event->pos().y() - rect_corner + gap_ / 2) / gap_;
     if (x >= 0 && x < n_board_ && y >= 0 && y < n_board_) {
         onBoardClicked(x, y);
     }
