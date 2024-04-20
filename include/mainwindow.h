@@ -1,5 +1,4 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
 #include <QMainWindow>
 #include <memory>
@@ -23,6 +22,5 @@ class MainWindow : public QMainWindow {
     std::unique_ptr<SurakartaSessionWindow> sessionWindow;
 
    private slots:
-    void startSession();
+    void StartSession();
 };
-#endif  // MAINWINDOW_H

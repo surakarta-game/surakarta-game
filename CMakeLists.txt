@@ -9,18 +9,25 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+add_compile_options(-fsanitize=address)
+add_compile_options(-g)
+add_link_options(-fsanitize=address)
+
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Core)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 set(PROJECT_SOURCES
         include/mainwindow.h
         include/surakarta_session_window.h
         include/surakarta_board_widget.h
+        include/surakarta_animation.h
+        include/surakarta_daemon_thread.h
         src/main.cpp
         src/mainwindow.cpp
         src/surakarta_session_window.cpp
         src/surakarta_board_widget.cpp
+        src/surakarta_animation.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -49,7 +56,7 @@ endif()
 # use libsurakarta:
 include_directories(third-party/surakarta-core/include)
 add_subdirectory(third-party/surakarta-core ${CMAKE_BINARY_DIR}/third-party/surakarta-core/src)
-target_link_libraries(surakarta-game PRIVATE Qt${QT_VERSION_MAJOR}::Widgets surakarta)
+target_link_libraries(surakarta-game PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Core surakarta)
 
 set_target_properties(surakarta-game PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
