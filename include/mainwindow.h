@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <memory>
+#include "surakarta_session_window.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -18,5 +20,9 @@ class MainWindow : public QMainWindow {
 
    private:
     Ui::MainWindow* ui;
+    std::unique_ptr<SurakartaSessionWindow> sessionWindow;
+
+   private slots:
+    void startSession();
 };
 #endif  // MAINWINDOW_H

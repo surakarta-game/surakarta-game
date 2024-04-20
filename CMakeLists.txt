@@ -15,8 +15,12 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 set(PROJECT_SOURCES
         include/mainwindow.h
+        include/surakarta_session_window.h
+        include/surakarta_board_widget.h
         src/main.cpp
         src/mainwindow.cpp
+        src/surakarta_session_window.cpp
+        src/surakarta_board_widget.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
