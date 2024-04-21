@@ -1,5 +1,6 @@
 #include "surakarta_session_window.h"
 #include <QCloseEvent>
+#include <thread>
 #include "ui_surakarta_session_window.h"
 
 SurakartaSessionWindow::SurakartaSessionWindow(
@@ -13,6 +14,8 @@ SurakartaSessionWindow::SurakartaSessionWindow(
     ui->surakarta_board->UsePieceUpdater(
         [&]() { return handler_->CopyMyPieces(); },
         [&]() { return handler_->CopyOpponentPieces(); });
+    while (!handler_->IsAgentCreated())
+        std::this_thread::sleep_for(std::chrono::milliseconds(0));
     handler_->OnMoveCommitted.AddListener([&](SurakartaMoveTrace trace) {
         std::lock_guard<std::mutex> lock(mutex_);
         move_queue_.push(trace);
