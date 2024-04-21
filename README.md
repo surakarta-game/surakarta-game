@@ -21,7 +21,7 @@ On other GNU/Linux distributions or other OS such as MacOS, you need to install 
 
 ## Development
 
-We recommend you to use QT Creator to develop this project.
+We recommend you to use VSCode and Qt Designer to develop this project, since clang-tidy is supported better by VSCode than by Qt Creator. 
 
 You must clone this repository recursively, because you need to download dependencies:
 ```bash
