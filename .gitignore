@@ -55,3 +55,6 @@ compile_commands.json
 
 # CMake build folder
 build/
+
+# VSCode Config
+.vscode/
