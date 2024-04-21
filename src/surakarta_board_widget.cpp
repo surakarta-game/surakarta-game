@@ -6,8 +6,13 @@
 #include <chrono>
 #include <iostream>
 
-SurakartaBoardWidget::SurakartaBoardWidget(QWidget* parent)
-    : QWidget(parent) {
+SurakartaBoardWidget::SurakartaBoardWidget(
+    QWidget* parent,
+    std::function<std::unique_ptr<std::vector<SurakartaPositionWithId>>()> black_pieces_getter,
+    std::function<std::unique_ptr<std::vector<SurakartaPositionWithId>>()> white_pieces_getter)
+    : QWidget(parent),
+      black_pieces_getter_(black_pieces_getter),
+      white_pieces_getter_(white_pieces_getter) {
     QPalette pal = palette();
     pal.setColor(QPalette::Window, QColor(0xEA, 0xD7, 0xAF));
     setAutoFillBackground(true);
@@ -21,7 +26,8 @@ SurakartaBoardWidget::SurakartaBoardWidget(QWidget* parent)
     connect(timer.get(), &QTimer::timeout, this, &SurakartaBoardWidget::OnTimerTick);
 }
 
-void SurakartaBoardWidget::LoadSize(int size, int n_board) {
+void SurakartaBoardWidget::LoadN(int n_board) {
+    const auto size = std::min(this->size().width(), this->size().height());
     if (n_board % 2 != 0) {
         QMessageBox::warning(this, "Error", "The number of boards must be even.");
     }
@@ -62,6 +68,13 @@ void SurakartaBoardWidget::ReloadPieces(
         };
         animations->at(i) = std::move(animation);
     }
+}
+
+void SurakartaBoardWidget::UsePieceUpdater(
+    std::function<std::unique_ptr<std::vector<SurakartaPositionWithId>>()> black_pieces_getter,
+    std::function<std::unique_ptr<std::vector<SurakartaPositionWithId>>()> white_pieces_getter) {
+    black_pieces_getter_ = black_pieces_getter;
+    white_pieces_getter_ = white_pieces_getter;
 }
 
 void SurakartaBoardWidget::SelectPiece(int x, int y) {
@@ -108,9 +121,15 @@ void SurakartaBoardWidget::paintEvent(QPaintEvent* event) {
     }
     for (int i = 0; i < pieces->size(); i++) {
         if (pieces->at(i).color == PieceColor::BLACK) {
-            PaintBlackPiece(pieces->at(i).x, pieces->at(i).y);
+            const auto piece = pieces->at(i);
+            // if (piece.x < -2 * gap_ || piece.x > length + 2 * gap_ || piece.y < -2 * gap_ || piece.y > length + 2 * gap_)
+            //     printf("black out of bound: %f, %f\n", piece.x, piece.y);
+            PaintBlackPiece(piece.x, piece.y);
         } else if (pieces->at(i).color == PieceColor::WHITE) {
-            PaintWhitePiece(pieces->at(i).x, pieces->at(i).y);
+            const auto piece = pieces->at(i);
+            // if (piece.x < -2 * gap_ || piece.x > length + 2 * gap_ || piece.y < -2 * gap_ || piece.y > length + 2 * gap_)
+            //     printf("white out of bound: %f, %f\n", piece.x, piece.y);
+            PaintWhitePiece(piece.x, piece.y);
         }
     }
     if (is_piece_selected) {
@@ -127,6 +146,13 @@ void SurakartaBoardWidget::mousePressEvent(QMouseEvent* event) {
     if (x >= 0 && x < n_board_ && y >= 0 && y < n_board_) {
         onBoardClicked(x, y);
     }
+}
+
+void SurakartaBoardWidget::resizeEvent(QResizeEvent* event) {
+    const auto size = std::min(event->size().width(), event->size().height());
+    if (event->size().width() != size || event->size().height() != size)
+        resize(size, size);
+    LoadN(n_board_);
 }
 
 void SurakartaBoardWidget::PaintBlackPiece(double x, double y) {
@@ -167,30 +193,57 @@ void SurakartaBoardWidget::PaintSelection(int x, int y) {
     painter.drawRect(rect_corner + x * gap_ + 2 * pixel, rect_corner + y * gap_ + 3 * pixel, 1 * pixel, 1 * pixel);
 }
 
+void SurakartaBoardWidget::TrySyncPieces() {
+    if (black_pieces_getter_ && white_pieces_getter_) {
+        timer->stop();
+        const auto black = black_pieces_getter_();
+        for (int i = 0; i < black->size(); i++) {
+            pieces->at(black->at(i).id).x = static_cast<double>(black->at(i).x);
+            pieces->at(black->at(i).id).y = static_cast<double>(black->at(i).y);
+            pieces->at(black->at(i).id).color = PieceColor::BLACK;
+        }
+        const auto white = white_pieces_getter_();
+        for (int i = 0; i < white->size(); i++) {
+            pieces->at(white->at(i).id).x = static_cast<double>(white->at(i).x);
+            pieces->at(white->at(i).id).y = static_cast<double>(white->at(i).y);
+            pieces->at(white->at(i).id).color = PieceColor::WHITE;
+        }
+        timer->start();
+    }
+}
+
 void SurakartaBoardWidget::RemovePiece(int index) {
     pieces->at(index).color = PieceColor::NONE;
     update();
 }
 
 void SurakartaBoardWidget::OnTimerTick() {
-    for (int i = 0; i < total_length; i++) {
-        if (!animations->at(i).animation.Empty()) {
-            PieceStatus status = pieces->at(i);
-            const int time = std::chrono::duration_cast<std::chrono::milliseconds>(
-                                 std::chrono::system_clock::now().time_since_epoch())
-                                 .count() -
-                             animations->at(i).start_time;
-            SurakartaAnimation::Point point = animations->at(i).animation.PositionAt(time);
-            // printf("(%d)  x: %f, y: %f\n", time, point.x, point.y);
-            status.x = point.x;
-            status.y = point.y;
-            pieces->at(i) = status;
-            if (animations->at(i).animation.Finished()) {
-                animations->at(i).animation = SurakartaAnimation();
+    if (mutex.try_lock()) {
+        bool flag = false;
+        bool flag2 = false;
+        for (int i = 0; i < total_length; i++) {
+            if (!animations->at(i).animation.Empty()) {
+                const int time = std::chrono::duration_cast<std::chrono::milliseconds>(
+                                     std::chrono::system_clock::now().time_since_epoch())
+                                     .count() -
+                                 animations->at(i).start_time;
+                SurakartaAnimation::Point point = animations->at(i).animation.PositionAt(time);
+                // printf("(%d)  x: %f, y: %f\n", time, point.x, point.y);
+                pieces->at(i).x = point.x;
+                pieces->at(i).y = point.y;
+                if (animations->at(i).animation.Finished()) {
+                    animations->at(i).animation = SurakartaAnimation();
+                    flag2 = true;
+                } else
+                    flag = true;
             }
         }
+        if (flag2 && !flag)
+            TrySyncPieces();
+
+        update();
+        mutex.unlock();
     }
-    update();
 }
 
 void SurakartaBoardWidget::OnMoveCommitted(const SurakartaMoveTrace& trace) {
@@ -199,11 +252,12 @@ void SurakartaBoardWidget::OnMoveCommitted(const SurakartaMoveTrace& trace) {
         .start_time = (int)std::chrono::duration_cast<std::chrono::milliseconds>(
                           std::chrono::system_clock::now().time_since_epoch())
                           .count(),
-        .animation = SurakartaAnimation(trace.path, 1000),
+        .animation = SurakartaAnimation(trace.path, animation_milliseconds),
     };
     (*animations)[trace.moved_piece.id] = std::move(animation);
-    if (trace.captured_piece.id != -1)
-        QTimer::singleShot(1000, this, [=]() {
+    if (trace.is_capture)
+        QTimer::singleShot(animation_milliseconds, this, [=]() {
+            // printf("remove [%d](%d, %d)\n", trace.captured_piece.id, trace.captured_piece.x, trace.captured_piece.y);
             this->RemovePiece(trace.captured_piece.id);
         });
 }

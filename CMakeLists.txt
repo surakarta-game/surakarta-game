@@ -9,9 +9,9 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# add_compile_options(-fsanitize=address)
-# add_compile_options(-g)
-# add_link_options(-fsanitize=address)
+#add_compile_options(-fsanitize=address)
+#add_compile_options(-g)
+#add_link_options(-fsanitize=address)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Core)
@@ -23,11 +23,13 @@ set(PROJECT_SOURCES
         include/surakarta_board_widget.h
         include/surakarta_animation.h
         include/surakarta_daemon_thread.h
+        include/surakarta_agent_setting_widget.h
         src/main.cpp
         src/mainwindow.cpp
         src/surakarta_session_window.cpp
         src/surakarta_board_widget.cpp
         src/surakarta_animation.cpp
+        src/surakarta_agent_setting_widget.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

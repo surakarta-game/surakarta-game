@@ -9,7 +9,10 @@ SurakartaSessionWindow::SurakartaSessionWindow(
       ui(new Ui::SurakartaSessionWindow),
       handler_(handler) {
     ui->setupUi(this);
-    ui->surakarta_board->LoadSize(800, BOARD_SIZE);
+    ui->surakarta_board->LoadN(BOARD_SIZE);
+    ui->surakarta_board->UsePieceUpdater(
+        [&]() { return handler_->CopyMyPieces(); },
+        [&]() { return handler_->CopyOpponentPieces(); });
     handler_->OnMoveCommitted.AddListener([&](SurakartaMoveTrace trace) {
         std::lock_guard<std::mutex> lock(mutex_);
         move_queue_.push(trace);
