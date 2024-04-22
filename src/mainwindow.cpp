@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include <QMessageBox>
+#include <QThreadPool>
 #include "./ui_mainwindow.h"
 #include "surakarta_daemon_thread.h"
 #include "surakarta_session_window.h"
@@ -68,17 +69,18 @@ void MainWindow::StartSession() {
     const auto handler = std::make_shared<SurakartaAgentInteractiveHandler>();
     handler->BlockAgentCreation();
     const auto my_agent_factory = handler->GetAgentFactory();
-    QThread* daemon = new SurakartaDaemonThread(
+    auto daemon = std::make_unique<SurakartaDaemonThread>(
         std::make_unique<SurakartaDaemon>(BOARD_SIZE, MAX_NO_CAPTURE_ROUND, my_agent_factory, std::move(ai_agent_factory_opt.value())));
     daemon->start();
-    sessionWindow = std::make_unique<SurakartaSessionWindow>(handler);
+    sessionWindow = std::make_unique<SurakartaSessionWindow>(handler, std::move(daemon));
     sessionWindow->show();
     this->hide();
     this->timer->stop();
-    connect(sessionWindow.get(), &SurakartaSessionWindow::closed, this, &MainWindow::ReShow);
+    connect(sessionWindow.get(), &SurakartaSessionWindow::closed, this, &MainWindow::OnSessionWindowClosed);
 }
 
-void MainWindow::ReShow() {
+void MainWindow::OnSessionWindowClosed() {
+    garbage.push_back(std::move(sessionWindow));  // move the window object to garbage
     this->show();
     this->timer->setInterval(0);
     this->timer->start();

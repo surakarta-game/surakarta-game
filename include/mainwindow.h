@@ -21,12 +21,14 @@ class MainWindow : public QMainWindow {
 
    private:
     Ui::MainWindow* ui;
-    std::unique_ptr<SurakartaSessionWindow> sessionWindow;
+    std::shared_ptr<SurakartaSessionWindow> sessionWindow;
+    std::vector<std::shared_ptr<SurakartaSessionWindow>> garbage;  // to prevent old session window from being deleted
+                                                                   // deleteing old session window may cause crash
     QTimer* timer;
     int circle_time = 1000;
 
    private slots:
     void StartSession();
     void OnTimerTimeout();
-    void ReShow();
+    void OnSessionWindowClosed();
 };
