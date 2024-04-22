@@ -71,14 +71,17 @@ void SurakartaSessionWindow::UpdateInfo() {
 
 void SurakartaSessionWindow::OnBoardClicked(int x, int y) {
     if (handler_->CanSelectPiece(SurakartaPosition(x, y))) {
-        assert(handler_->SelectPiece(SurakartaPosition(x, y)));
+        const auto ret = handler_->SelectPiece(SurakartaPosition(x, y));
+        assert(ret);
         UpdateInfo();
     } else if (handler_->CanSelectDestination(SurakartaPosition(x, y))) {
-        assert(handler_->SelectDestination(SurakartaPosition(x, y)));
+        const auto ret = handler_->SelectDestination(SurakartaPosition(x, y));
+        assert(ret);
         UpdateInfo();
     }
 }
 
 void SurakartaSessionWindow::OnCommitButtonClicked() {
-    assert(handler_->CommitMove());
+    const auto ret = handler_->CommitMove();
+    assert(ret);
 }
