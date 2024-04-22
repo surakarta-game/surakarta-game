@@ -1,5 +1,6 @@
 #include "surakarta_session_window.h"
 #include <QCloseEvent>
+#include <thread>
 #include "ui_surakarta_session_window.h"
 
 SurakartaSessionWindow::SurakartaSessionWindow(
@@ -8,21 +9,39 @@ SurakartaSessionWindow::SurakartaSessionWindow(
     : QWidget(parent),
       ui(new Ui::SurakartaSessionWindow),
       handler_(handler) {
+    // set up UI
     ui->setupUi(this);
     ui->surakarta_board->LoadN(BOARD_SIZE);
+
+    // set up event handlers
+
+    // ui events
+    connect(ui->surakarta_board, &SurakartaBoardWidget::onBoardClicked, this, &SurakartaSessionWindow::OnBoardClicked);
+    connect(ui->commitButton, &QPushButton::clicked, this, &SurakartaSessionWindow::OnCommitButtonClicked);
     ui->surakarta_board->UsePieceUpdater(
         [&]() { return handler_->CopyMyPieces(); },
         [&]() { return handler_->CopyOpponentPieces(); });
-    handler_->OnMoveCommitted.AddListener([&](SurakartaMoveTrace trace) {
-        std::lock_guard<std::mutex> lock(mutex_);
-        move_queue_.push(trace);
-        onMoveCommitted();
+
+    // handler event chains
+    // since event from the handler may come from another thread, we need to use signal-slot mechanism
+
+    handler_->OnAgentCreated.AddListener([&]() {
+        onAgentCreated();
     });
-    ui->surakarta_board->ReloadPieces(handler_->CopyMyPieces(), handler_->CopyOpponentPieces());
+    connect(this, &SurakartaSessionWindow::onAgentCreated, this, &SurakartaSessionWindow::OnAgentCreated);
+    
+    handler_->OnWaitingForMove.AddListener([&]() {
+        onWaitingForMove();
+    });
+    connect(this, &SurakartaSessionWindow::onWaitingForMove, this, &SurakartaSessionWindow::OnWaitingForMove);
+
+    handler_->OnMoveCommitted.AddListener([&](SurakartaMoveTrace trace) {
+        onMoveCommitted(trace);
+    });
     connect(this, &SurakartaSessionWindow::onMoveCommitted, this, &SurakartaSessionWindow::OnMoveCommitted);
-    connect(ui->surakarta_board, &SurakartaBoardWidget::onBoardClicked, this, &SurakartaSessionWindow::OnBoardClicked);
-    connect(ui->commitButton, &QPushButton::clicked, this, &SurakartaSessionWindow::OnCommitButtonClicked);
-    UpdateInfo();
+
+    // Allow agent creation
+    handler_->UnblockAgentCreation();
 }
 
 SurakartaSessionWindow::~SurakartaSessionWindow() {
@@ -32,16 +51,6 @@ SurakartaSessionWindow::~SurakartaSessionWindow() {
 void SurakartaSessionWindow::closeEvent(QCloseEvent* event) {
     closed();
     event->accept();
-}
-
-void SurakartaSessionWindow::OnMoveCommitted() {
-    std::lock_guard<std::mutex> lock(mutex_);
-    if (move_queue_.empty())
-        return;
-    const auto trace = move_queue_.front();
-    move_queue_.pop();
-    ui->surakarta_board->OnMoveCommitted(trace);
-    UpdateInfo();
 }
 
 void SurakartaSessionWindow::UpdateInfo() {
@@ -71,14 +80,31 @@ void SurakartaSessionWindow::UpdateInfo() {
 
 void SurakartaSessionWindow::OnBoardClicked(int x, int y) {
     if (handler_->CanSelectPiece(SurakartaPosition(x, y))) {
-        assert(handler_->SelectPiece(SurakartaPosition(x, y)));
+        const auto ret = handler_->SelectPiece(SurakartaPosition(x, y));
+        assert(ret);
         UpdateInfo();
     } else if (handler_->CanSelectDestination(SurakartaPosition(x, y))) {
-        assert(handler_->SelectDestination(SurakartaPosition(x, y)));
+        const auto ret = handler_->SelectDestination(SurakartaPosition(x, y));
+        assert(ret);
         UpdateInfo();
     }
 }
 
 void SurakartaSessionWindow::OnCommitButtonClicked() {
-    assert(handler_->CommitMove());
+    const auto ret = handler_->CommitMove();
+    assert(ret);
+}
+
+void SurakartaSessionWindow::OnAgentCreated() {
+    ui->surakarta_board->ReloadPieces(handler_->CopyMyPieces(), handler_->CopyOpponentPieces());
+    UpdateInfo();
+}
+
+void SurakartaSessionWindow::OnWaitingForMove() {
+    UpdateInfo();
+}
+
+void SurakartaSessionWindow::OnMoveCommitted(SurakartaMoveTrace trace) {
+    ui->surakarta_board->OnMoveCommitted(trace);
+    UpdateInfo();
 }

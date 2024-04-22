@@ -22,16 +22,18 @@ class SurakartaSessionWindow : public QWidget {
    private:
     Ui::SurakartaSessionWindow* ui;
     std::shared_ptr<SurakartaAgentInteractiveHandler> handler_;
-    std::mutex mutex_;
-    std::queue<SurakartaMoveTrace> move_queue_;
     void closeEvent(QCloseEvent* event) override;
 
    signals:
     void closed();
-    void onMoveCommitted();
+    void onAgentCreated();
+    void onWaitingForMove();
+    void onMoveCommitted(SurakartaMoveTrace trace);
 
    private slots:
     void OnBoardClicked(int x, int y);
     void OnCommitButtonClicked();
-    void OnMoveCommitted();
+    void OnAgentCreated();
+    void OnWaitingForMove();
+    void OnMoveCommitted(SurakartaMoveTrace trace);
 };
