@@ -21,8 +21,8 @@ class SurakartaLetYouWinMoveWeightUtil : public SurakartaMoveWeightUtilBase {
             std::shared_ptr<SurakartaAgentMineFactory::SurakartaMoveWeightUtilBaseFactory> inner_factory)
             : inner_factory_(inner_factory) {}
 
-        virtual std::unique_ptr<SurakartaMoveWeightUtilBase> CreateUtil(SurakartaDaemon& daemon, PieceColor my_color) override {
-            return std::make_unique<SurakartaLetYouWinMoveWeightUtil>(daemon.Board(), my_color, inner_factory_->CreateUtil(daemon, my_color));
+        virtual std::unique_ptr<SurakartaMoveWeightUtilBase> CreateUtil(std::shared_ptr<SurakartaBoard> board, PieceColor curr_colour) override {
+            return std::make_unique<SurakartaLetYouWinMoveWeightUtil>(board, curr_colour, inner_factory_->CreateUtil(board, curr_colour));
         }
 
        private:
@@ -30,8 +30,7 @@ class SurakartaLetYouWinMoveWeightUtil : public SurakartaMoveWeightUtilBase {
     };
 
    private:
-    std::shared_ptr<SurakartaMoveWeightUtilBase>
-        util;
+    std::shared_ptr<SurakartaMoveWeightUtilBase> util;
 };
 
 SurakartaAgentSettingWidget::SurakartaAgentSettingWidget(QWidget* parent)
