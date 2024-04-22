@@ -17,9 +17,7 @@ SurakartaSessionWindow::SurakartaSessionWindow(
     while (!handler_->IsAgentCreated())
         std::this_thread::sleep_for(std::chrono::milliseconds(0));
     handler_->OnMoveCommitted.AddListener([&](SurakartaMoveTrace trace) {
-        std::lock_guard<std::mutex> lock(mutex_);
-        move_queue_.push(trace);
-        onMoveCommitted();
+        onMoveCommitted(trace);
     });
     ui->surakarta_board->ReloadPieces(handler_->CopyMyPieces(), handler_->CopyOpponentPieces());
     connect(this, &SurakartaSessionWindow::onMoveCommitted, this, &SurakartaSessionWindow::OnMoveCommitted);
@@ -37,12 +35,7 @@ void SurakartaSessionWindow::closeEvent(QCloseEvent* event) {
     event->accept();
 }
 
-void SurakartaSessionWindow::OnMoveCommitted() {
-    std::lock_guard<std::mutex> lock(mutex_);
-    if (move_queue_.empty())
-        return;
-    const auto trace = move_queue_.front();
-    move_queue_.pop();
+void SurakartaSessionWindow::OnMoveCommitted(SurakartaMoveTrace trace) {
     ui->surakarta_board->OnMoveCommitted(trace);
     UpdateInfo();
 }
