@@ -66,6 +66,7 @@ void MainWindow::StartSession() {
         return;
     }
     const auto handler = std::make_shared<SurakartaAgentInteractiveHandler>();
+    handler->BlockAgentCreation();
     const auto my_agent_factory = handler->GetAgentFactory();
     QThread* daemon = new SurakartaDaemonThread(
         std::make_unique<SurakartaDaemon>(BOARD_SIZE, MAX_NO_CAPTURE_ROUND, my_agent_factory, std::move(ai_agent_factory_opt.value())));
