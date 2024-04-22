@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>867</width>
+    <width>917</width>
     <height>626</height>
    </rect>
   </property>
@@ -86,7 +86,7 @@
     </widget>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout" stretch="15,2,2">
+    <layout class="QVBoxLayout" name="verticalLayout" stretch="15,0,0,2">
      <item>
       <spacer name="verticalSpacer">
        <property name="orientation">
@@ -134,6 +134,48 @@
       </layout>
      </item>
      <item>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="title">
+        <string>AI Helper</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="QGroupBox" name="groupBox_2">
+          <property name="title">
+           <string>AI Setting</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <item>
+            <widget class="SurakartaAgentSettingWidget" name="ai_helper_setting" native="true"/>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="ai_auto_suggest">
+          <property name="text">
+           <string>Auto Suggest</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="ai_auto_commit">
+          <property name="text">
+           <string>Auto Commit</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="ai_suggest_button">
+          <property name="text">
+           <string>Suggest</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="commitButton">
        <property name="text">
         <string>Commit</string>
@@ -162,6 +204,12 @@
    <class>SurakartaBoardWidget</class>
    <extends>QWidget</extends>
    <header>surakarta_board_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>SurakartaAgentSettingWidget</class>
+   <extends>QWidget</extends>
+   <header>surakarta_agent_setting_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
