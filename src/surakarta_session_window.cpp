@@ -9,20 +9,30 @@ SurakartaSessionWindow::SurakartaSessionWindow(
     : QWidget(parent),
       ui(new Ui::SurakartaSessionWindow),
       handler_(handler) {
+    // set up UI
     ui->setupUi(this);
     ui->surakarta_board->LoadN(BOARD_SIZE);
+
+    // set up event handlers
     ui->surakarta_board->UsePieceUpdater(
         [&]() { return handler_->CopyMyPieces(); },
         [&]() { return handler_->CopyOpponentPieces(); });
-    while (!handler_->IsAgentCreated())
-        std::this_thread::sleep_for(std::chrono::milliseconds(0));
+    connect(this, &SurakartaSessionWindow::onMoveCommitted, this, &SurakartaSessionWindow::OnMoveCommitted);
+    connect(this, &SurakartaSessionWindow::onWaitingForMove, this, &SurakartaSessionWindow::OnWaitingForMove);
+    connect(ui->surakarta_board, &SurakartaBoardWidget::onBoardClicked, this, &SurakartaSessionWindow::OnBoardClicked);
+    connect(ui->commitButton, &QPushButton::clicked, this, &SurakartaSessionWindow::OnCommitButtonClicked);
     handler_->OnMoveCommitted.AddListener([&](SurakartaMoveTrace trace) {
         onMoveCommitted(trace);
     });
+    handler_->OnWaitingForMove.AddListener([&]() {
+        onWaitingForMove();
+    });
+    handler_->UnblockAgentCreation();
+
+    // wait for agent creation and update UI
+    while (!handler_->IsAgentCreated())
+        std::this_thread::sleep_for(std::chrono::milliseconds(0));
     ui->surakarta_board->ReloadPieces(handler_->CopyMyPieces(), handler_->CopyOpponentPieces());
-    connect(this, &SurakartaSessionWindow::onMoveCommitted, this, &SurakartaSessionWindow::OnMoveCommitted);
-    connect(ui->surakarta_board, &SurakartaBoardWidget::onBoardClicked, this, &SurakartaSessionWindow::OnBoardClicked);
-    connect(ui->commitButton, &QPushButton::clicked, this, &SurakartaSessionWindow::OnCommitButtonClicked);
     UpdateInfo();
 }
 
@@ -37,6 +47,10 @@ void SurakartaSessionWindow::closeEvent(QCloseEvent* event) {
 
 void SurakartaSessionWindow::OnMoveCommitted(SurakartaMoveTrace trace) {
     ui->surakarta_board->OnMoveCommitted(trace);
+    UpdateInfo();
+}
+
+void SurakartaSessionWindow::OnWaitingForMove() {
     UpdateInfo();
 }
 

@@ -27,9 +27,11 @@ class SurakartaSessionWindow : public QWidget {
    signals:
     void closed();
     void onMoveCommitted(SurakartaMoveTrace trace);
+    void onWaitingForMove();
 
    private slots:
     void OnBoardClicked(int x, int y);
     void OnCommitButtonClicked();
     void OnMoveCommitted(SurakartaMoveTrace trace);
+    void OnWaitingForMove();
 };
