@@ -1,3 +1,6 @@
 [submodule "surakarta-core"]
 	path = third-party/surakarta-core
 	url = https://github.com/surakarta-game/surakarta-core.git
+[submodule "third-party/surakarta-alphazero"]
+	path = third-party/surakarta-alphazero
+	url = https://github.com/surakarta-game/surakarta-alphazero

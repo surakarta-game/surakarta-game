@@ -58,6 +58,9 @@ endif()
 # use libsurakarta:
 include_directories(third-party/surakarta-core/include)
 add_subdirectory(third-party/surakarta-core ${CMAKE_BINARY_DIR}/third-party/surakarta-core/src)
+# use libsurakarta-alphazero:
+include_directories(third-party/surakarta-alphazero/include)
+add_subdirectory(third-party/surakarta-alphazero ${CMAKE_BINARY_DIR}/third-party/surakarta-alphazero/src)
 target_link_libraries(surakarta-game PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Core surakarta)
 
 set_target_properties(surakarta-game PROPERTIES
