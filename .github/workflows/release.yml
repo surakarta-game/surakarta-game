@@ -105,9 +105,6 @@ jobs:
         cp ${{github.workspace}}/build/bin/surakarta-benchmark.exe ${{github.workspace}}\build\${{ env.RELEASE_NAME }}\
         cd ${{github.workspace}}\build\${{ env.RELEASE_NAME }}\
         windeployqt.exe ${{ env.EXECUTABLE_NAME }} --release
-        windeployqt.exe surakarta-alphazero-benchmark.exe --release
-        windeployqt.exe surakarta-alphazero-train.exe --release
-        windeployqt.exe surakarta-benchmark.exe --release
         ls
         Compress-Archive -Path ${{github.workspace}}\build\${{ env.RELEASE_NAME }}\ -DestinationPath ${{github.workspace}}\build\${{ env.ARCHIVE_NAME }}
     -
