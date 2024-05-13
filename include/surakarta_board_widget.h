@@ -3,7 +3,6 @@
 #include <QWidget>
 #include <vector>
 #include "surakarta.h"
-#include "surakarta_animation.h"
 
 class SurakartaBoardWidget : public QWidget {
     Q_OBJECT
@@ -63,7 +62,7 @@ class SurakartaBoardWidget : public QWidget {
     struct PieceAnimation {
         int piece_index;
         int start_time;
-        SurakartaAnimation animation;
+        std::shared_ptr<SurakartaAnimationBase> animation;
     };
 
     int total_length;
