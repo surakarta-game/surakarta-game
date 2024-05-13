@@ -64,8 +64,7 @@ void SurakartaBoardWidget::ReloadPieces(
         PieceAnimation animation{
             .piece_index = i,
             .start_time = 0,
-            .animation = SurakartaAnimation(),
-        };
+            .animation = nullptr};
         animations->at(i) = std::move(animation);
     }
 }
@@ -222,17 +221,17 @@ void SurakartaBoardWidget::OnTimerTick() {
         bool flag = false;
         bool flag2 = false;
         for (int i = 0; i < total_length; i++) {
-            if (!animations->at(i).animation.Empty()) {
+            if (animations->at(i).animation != nullptr) {
                 const int time = std::chrono::duration_cast<std::chrono::milliseconds>(
                                      std::chrono::system_clock::now().time_since_epoch())
                                      .count() -
                                  animations->at(i).start_time;
-                SurakartaAnimation::Point point = animations->at(i).animation.PositionAt(time);
+                const auto point = animations->at(i).animation->PositionAt(time);
                 // printf("(%d)  x: %f, y: %f\n", time, point.x, point.y);
                 pieces->at(i).x = point.x;
                 pieces->at(i).y = point.y;
-                if (animations->at(i).animation.Finished()) {
-                    animations->at(i).animation = SurakartaAnimation();
+                if (animations->at(i).animation->Finished()) {
+                    animations->at(i).animation = nullptr;
                     flag2 = true;
                 } else
                     flag = true;
@@ -252,7 +251,7 @@ void SurakartaBoardWidget::OnMoveCommitted(const SurakartaMoveTrace& trace) {
         .start_time = (int)std::chrono::duration_cast<std::chrono::milliseconds>(
                           std::chrono::system_clock::now().time_since_epoch())
                           .count(),
-        .animation = SurakartaAnimation(trace.path, animation_milliseconds),
+        .animation = trace.ToAnimation(),
     };
     (*animations)[trace.moved_piece.id] = std::move(animation);
     if (trace.is_capture)

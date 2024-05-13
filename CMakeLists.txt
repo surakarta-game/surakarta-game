@@ -21,14 +21,12 @@ set(PROJECT_SOURCES
         include/mainwindow.h
         include/surakarta_session_window.h
         include/surakarta_board_widget.h
-        include/surakarta_animation.h
         include/surakarta_daemon_thread.h
         include/surakarta_agent_setting_widget.h
         src/main.cpp
         src/mainwindow.cpp
         src/surakarta_session_window.cpp
         src/surakarta_board_widget.cpp
-        src/surakarta_animation.cpp
         src/surakarta_agent_setting_widget.cpp
 )
 
