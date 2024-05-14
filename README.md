@@ -10,12 +10,14 @@ On Debian or Ubuntu, you can use the following commands to install this game:
 sudo update
 sudo apt install qt6-base-dev libglx-dev libgl1-mesa-dev
 git clone https://github.com/surakarta-game/surakarta-game.git --recursive
+cd surakarta-game
 mkdir build
 cd build
-cmake ../surakarta-game
-make
-sudo make install
+cmake -DCMAKE_INSTALL_PREFIX=/usr ..
+cmake --build . -j
+sudo cmake --install .
 ```
+and then you can use command ```surakarta-game``` to play!
 
 On other GNU/Linux distributions or other OS such as MacOS, you need to install Qt6 and use cmake to build this project.
 

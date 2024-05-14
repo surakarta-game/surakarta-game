@@ -100,6 +100,7 @@ jobs:
       run: |
         mkdir ${{github.workspace}}\build\${{ env.RELEASE_NAME }}\
         cp ${{github.workspace}}/build/${{ env.EXECUTABLE_NAME }} ${{github.workspace}}\build\${{ env.RELEASE_NAME }}\
+        cp ${{github.workspace}}/build/bin/libsurakarta.dll ${{github.workspace}}\build\${{ env.RELEASE_NAME }}\
         cd ${{github.workspace}}\build\${{ env.RELEASE_NAME }}\
         windeployqt.exe ${{ env.EXECUTABLE_NAME }} --release
         ls
@@ -131,10 +132,8 @@ jobs:
     -
       name: Build
       run: |
-        cd ..
         mkdir build
         cd build
-        cmake ${{github.workspace}}
-        make
-        ctest --build-config ${{env.BUILD_TYPE}}
-        sudo make install
+        cmake -DCMAKE_INSTALL_PREFIX=/usr ..
+        cmake --build . -j
+        sudo cmake --install .
