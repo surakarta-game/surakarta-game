@@ -100,6 +100,7 @@ jobs:
       run: |
         mkdir ${{github.workspace}}\build\${{ env.RELEASE_NAME }}\
         cp ${{github.workspace}}/build/${{ env.EXECUTABLE_NAME }} ${{github.workspace}}\build\${{ env.RELEASE_NAME }}\
+        cp ${{github.workspace}}/build/libsurakarta.dll ${{github.workspace}}\build\${{ env.RELEASE_NAME }}\
         cd ${{github.workspace}}\build\${{ env.RELEASE_NAME }}\
         windeployqt.exe ${{ env.EXECUTABLE_NAME }} --release
         ls
