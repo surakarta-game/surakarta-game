@@ -1,6 +1,11 @@
 #pragma once
 
 #include <QWidget>
+#include <QDebug>
+#include <QFile>
+#include <QResource>
+#include <QString>
+#include <QTextStream>
 #include <queue>
 #include "surakarta.h"
 #include "surakarta_daemon_thread.h"
@@ -28,6 +33,8 @@ class SurakartaSessionWindow : public QWidget {
     std::shared_ptr<SurakartaAgentInteractiveHandler> handler_;
     std::unique_ptr<SurakartaDaemonThread> daemon_thread_;
     void closeEvent(QCloseEvent* event) override;
+    void WriteManual(SurakartaMoveTrace trace);
+    QFile Manual;
 
    signals:
     // emulation signals are connected to the corresponding slots

@@ -34,6 +34,7 @@ class SurakartaBoardWidget : public QWidget {
     void UnselectPiece();
     void SelectDestination(int x, int y);
     void UnselectDestination();
+    //PieceColor GetColorOfPosition(int x, int y);
 
    private:
     void paintEvent(QPaintEvent* event) override;
@@ -71,12 +72,12 @@ class SurakartaBoardWidget : public QWidget {
     std::unique_ptr<QTimer> timer;
     int animation_milliseconds = 1000;
 
-    bool is_piece_selected;
-    int selected_piece_x;
-    int selected_piece_y;
-    bool is_destination_selected;
-    int selected_destination_x;
-    int selected_destination_y;
+    bool is_piece_selected = false;
+    int selected_piece_x = 0;
+    int selected_piece_y = 0;
+    bool is_destination_selected = false;
+    int selected_destination_x = 0;
+    int selected_destination_y = 0;
 
     std::function<std::unique_ptr<std::vector<SurakartaPositionWithId>>()> black_pieces_getter_;
     std::function<std::unique_ptr<std::vector<SurakartaPositionWithId>>()> white_pieces_getter_;

@@ -7,14 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>782</width>
-    <height>465</height>
+    <height>469</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,5">
+   <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
@@ -43,7 +43,7 @@
      </layout>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout" stretch="16,0,5">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="16,0,0,5">
       <item>
        <spacer name="verticalSpacer">
         <property name="orientation">
@@ -56,6 +56,13 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item>
+       <widget class="Line" name="line">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QGroupBox" name="groupBox">
@@ -96,7 +103,7 @@
      <x>0</x>
      <y>0</y>
      <width>782</width>
-     <height>23</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

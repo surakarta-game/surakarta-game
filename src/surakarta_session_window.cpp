@@ -5,6 +5,8 @@
 #include <thread>
 #include "ui_surakarta_session_window.h"
 
+#include "surakarta_board_widget.h"
+
 SurakartaSessionWindow::SurakartaSessionWindow(
     std::shared_ptr<SurakartaAgentInteractiveHandler> handler,
     std::unique_ptr<SurakartaDaemonThread> daemon_thread,
@@ -12,6 +14,7 @@ SurakartaSessionWindow::SurakartaSessionWindow(
     : QWidget(parent),
       ui(new Ui::SurakartaSessionWindow),
       handler_(handler),
+      Manual("./manual.txt"),
       daemon_thread_(std::move(daemon_thread)) {
     // set up UI
     ui->setupUi(this);
@@ -154,7 +157,33 @@ void SurakartaSessionWindow::OnWaitingForMove() {
     }
 }
 
+inline QChar numToLetter(int num) {
+    if (num >= 1 && num <= 6) {
+        return static_cast<QChar>('A' + num - 1);
+    } else {
+        throw std::invalid_argument("Number out of range for letter conversion.");
+    }
+}
+
 void SurakartaSessionWindow::OnMoveCommitted(SurakartaMoveTrace trace) {
     ui->surakarta_board->OnMoveCommitted(trace);
     UpdateInfo();
+
+    QString moveRecord = QString("%1%2-%3%4 ")
+                             .arg(trace.path[0].To().y)
+                             .arg(numToLetter(trace.path[0].To().x))
+                             .arg(trace.path[trace.path.size() - 1].To().y)
+                             .arg(numToLetter(trace.path[trace.path.size() - 1].To().x));
+    //* choose which file to write according to the piece color
+    //SurakartaPosition p(trace.path[trace.path.size() - 1].To().x, trace.path[trace.path.size() - 1].To().y);
+    //QFile* manualFile = (ui->surakarta_board->GetColorOfPosition(trace.path[trace.path.size() - 1].To().x,trace.path[trace.path.size() - 1].To().y) == PieceColor::BLACK) ? &Black_Manual : &White_Manual;
+    QFile* m=&Manual;
+    //* open and write
+    if (Manual.open(QIODevice::Append | QIODevice::Text)) {
+        QTextStream out(m);
+        out << moveRecord;
+        Manual.close();  //! dont forget to close the file
+    } else {
+        qDebug() << "Failed to open file for writing.";
+    }
 }

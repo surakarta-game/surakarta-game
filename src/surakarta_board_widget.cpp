@@ -4,7 +4,12 @@
 #include <QPainter>
 #include <QTimer>
 #include <chrono>
-#include <iostream>
+
+#include <QDebug>
+#include <QFile>
+#include <QResource>
+#include <QString>
+#include <QTextStream>
 
 SurakartaBoardWidget::SurakartaBoardWidget(
     QWidget* parent,
@@ -12,7 +17,10 @@ SurakartaBoardWidget::SurakartaBoardWidget(
     std::function<std::unique_ptr<std::vector<SurakartaPositionWithId>>()> white_pieces_getter)
     : QWidget(parent),
       black_pieces_getter_(black_pieces_getter),
-      white_pieces_getter_(white_pieces_getter) {
+      white_pieces_getter_(white_pieces_getter)
+
+      {
+
     QPalette pal = palette();
     pal.setColor(QPalette::Window, QColor(0xEA, 0xD7, 0xAF));
     setAutoFillBackground(true);
@@ -25,6 +33,16 @@ SurakartaBoardWidget::SurakartaBoardWidget(
     timer->start();
     connect(timer.get(), &QTimer::timeout, this, &SurakartaBoardWidget::OnTimerTick);
 }
+
+/*
+PieceColor SurakartaBoardWidget::GetColorOfPosition(int x,int y) {
+    for (int i = 0; i < pieces->size(); i++) {
+        if (pieces->at(i).x == x &&
+            pieces->at(i).y == y)
+            return pieces->at(i).color;
+    }
+    return PieceColor::NONE;
+}*/
 
 void SurakartaBoardWidget::LoadN(int n_board) {
     const auto size = std::min(this->size().width(), this->size().height());
