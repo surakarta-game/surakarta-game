@@ -70,7 +70,7 @@ void MainWindow::StartSession() {
     handler->BlockAgentCreation();
     const auto my_agent_factory = handler->GetAgentFactory();
     auto daemon = std::make_unique<SurakartaDaemonThread>(
-        std::make_unique<SurakartaDaemon>(BOARD_SIZE, MAX_NO_CAPTURE_ROUND, my_agent_factory, std::move(ai_agent_factory_opt.value())));
+        std::make_unique<SurakartaDaemon>(BOARD_SIZE, MAX_NO_CAPTURE_ROUND, std::move(ai_agent_factory_opt.value()), my_agent_factory));
     daemon->start();
     sessionWindow = std::make_unique<SurakartaSessionWindow>(handler, std::move(daemon));
     sessionWindow->show();
