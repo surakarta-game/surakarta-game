@@ -86,7 +86,7 @@
     </widget>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout" stretch="15,0,0,2">
+    <layout class="QVBoxLayout" name="verticalLayout" stretch="15,0,0,0,2">
      <item>
       <spacer name="verticalSpacer">
        <property name="orientation">
@@ -128,6 +128,24 @@
          </property>
          <property name="text">
           <string>You</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Remaining Time:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLCDNumber" name="remaining_time">
+         <property name="smallDecimalPoint">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
