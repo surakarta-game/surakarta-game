@@ -71,10 +71,10 @@ class SurakartaBoardWidget : public QWidget {
     std::unique_ptr<QTimer> timer;
     int animation_milliseconds = 1000;
 
-    bool is_piece_selected;
+    bool is_piece_selected = false;
     int selected_piece_x;
     int selected_piece_y;
-    bool is_destination_selected;
+    bool is_destination_selected = false;
     int selected_destination_x;
     int selected_destination_y;
 
