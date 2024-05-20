@@ -165,10 +165,7 @@ inline QChar numToLetter(int num) {
     }
 }
 
-void SurakartaSessionWindow::OnMoveCommitted(SurakartaMoveTrace trace) {
-    ui->surakarta_board->OnMoveCommitted(trace);
-    UpdateInfo();
-
+void SurakartaSessionWindow::WriteManual(SurakartaMoveTrace trace) {
     QString moveRecord = QString("%1%2-%3%4 ")
                              .arg(numToLetter(trace.path[0].From().x))
                              .arg(trace.path[0].From().y + 1)
@@ -186,4 +183,10 @@ void SurakartaSessionWindow::OnMoveCommitted(SurakartaMoveTrace trace) {
     } else {
         qDebug() << "Failed to open file for writing.";
     }
+}
+
+void SurakartaSessionWindow::OnMoveCommitted(SurakartaMoveTrace trace) {
+    ui->surakarta_board->OnMoveCommitted(trace);
+    UpdateInfo();
+    WriteManual(trace);
 }
