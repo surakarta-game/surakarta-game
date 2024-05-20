@@ -14,6 +14,7 @@ SurakartaSessionWindow::SurakartaSessionWindow(
     : QWidget(parent),
       ui(new Ui::SurakartaSessionWindow),
       handler_(handler),
+      Manual("./manual.txt"),
       daemon_thread_(std::move(daemon_thread)),
       max_time(max_time) {
     // set up UI
@@ -159,6 +160,34 @@ void SurakartaSessionWindow::OnWaitingForMove() {
         OnAiSuggestionButtonClicked();
     }
 }
+
+inline QChar numToLetter(int num) {
+    if (num >= 0 && num < 6) {
+        return static_cast<QChar>('A' + num);
+    } else {
+        throw std::invalid_argument("Number out of range for letter conversion.");
+    }
+}
+
+void SurakartaSessionWindow::WriteManual(SurakartaMoveTrace trace) {
+    QString moveRecord = QString("%1%2-%3%4 ")
+                             .arg(numToLetter(trace.path[0].From().x))
+                             .arg(trace.path[0].From().y + 1)
+                             .arg(numToLetter(trace.path[trace.path.size() - 1].To().x))
+                             .arg(trace.path[trace.path.size() - 1].To().y + 1);
+    //* choose which file to write according to the piece color
+    // SurakartaPosition p(trace.path[trace.path.size() - 1].To().x, trace.path[trace.path.size() - 1].To().y);
+    // QFile* manualFile = (ui->surakarta_board->GetColorOfPosition(trace.path[trace.path.size() - 1].To().x,trace.path[trace.path.size() - 1].To().y) == PieceColor::BLACK) ? &Black_Manual : &White_Manual;
+    QFile* m = &Manual;
+    //* open and write
+    if (Manual.open(QIODevice::Append | QIODevice::Text)) {
+        QTextStream out(m);
+        out << moveRecord;
+        Manual.close();  //! dont forget to close the file
+    } else {
+        qDebug() << "Failed to open file for writing.";
+    }
+}
 void SurakartaSessionWindow::StartTimer() {
     r_time = max_time;
     ui->remaining_time->display(r_time);
@@ -184,4 +213,5 @@ void SurakartaSessionWindow::OnMoveCommitted(SurakartaMoveTrace trace) {
     StartTimer();
     ui->surakarta_board->OnMoveCommitted(trace);
     UpdateInfo();
+    WriteManual(trace);
 }

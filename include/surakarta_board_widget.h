@@ -34,6 +34,7 @@ class SurakartaBoardWidget : public QWidget {
     void UnselectPiece();
     void SelectDestination(int x, int y);
     void UnselectDestination();
+    //PieceColor GetColorOfPosition(int x, int y);
 
    private:
     void paintEvent(QPaintEvent* event) override;

@@ -1,5 +1,10 @@
 #pragma once
 
+#include <QDebug>
+#include <QFile>
+#include <QResource>
+#include <QString>
+#include <QTextStream>
 #include <QTimer>
 #include <QWidget>
 #include <queue>
@@ -33,6 +38,8 @@ class SurakartaSessionWindow : public QWidget {
     QTimer* timer = new QTimer(this);
     int max_time;
     int r_time;
+    void WriteManual(SurakartaMoveTrace trace);
+    QFile Manual;
 
    signals:
     // emulation signals are connected to the corresponding slots

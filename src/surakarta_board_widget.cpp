@@ -4,7 +4,12 @@
 #include <QPainter>
 #include <QTimer>
 #include <chrono>
-#include <iostream>
+
+#include <QDebug>
+#include <QFile>
+#include <QResource>
+#include <QString>
+#include <QTextStream>
 
 SurakartaBoardWidget::SurakartaBoardWidget(
     QWidget* parent,
@@ -25,6 +30,16 @@ SurakartaBoardWidget::SurakartaBoardWidget(
     timer->start();
     connect(timer.get(), &QTimer::timeout, this, &SurakartaBoardWidget::OnTimerTick);
 }
+
+/*
+PieceColor SurakartaBoardWidget::GetColorOfPosition(int x,int y) {
+    for (int i = 0; i < pieces->size(); i++) {
+        if (pieces->at(i).x == x &&
+            pieces->at(i).y == y)
+            return pieces->at(i).color;
+    }
+    return PieceColor::NONE;
+}*/
 
 void SurakartaBoardWidget::LoadN(int n_board) {
     const auto size = std::min(this->size().width(), this->size().height());
