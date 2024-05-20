@@ -14,6 +14,7 @@ class SurakartaAgentSettingWidget : public QWidget {
     explicit SurakartaAgentSettingWidget(QWidget* parent = nullptr);
     ~SurakartaAgentSettingWidget();
     std::optional<std::unique_ptr<SurakartaDaemon::AgentFactory>> CreateAgentFactory();
+    void DisableRemote();
 
    private:
     Ui::SurakartaAgentSettingWidget* ui;

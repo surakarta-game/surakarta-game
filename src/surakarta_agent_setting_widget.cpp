@@ -73,6 +73,10 @@ std::optional<std::unique_ptr<SurakartaDaemon::AgentFactory>> SurakartaAgentSett
     }
 }
 
+void SurakartaAgentSettingWidget::DisableRemote() {
+    ui->comboBox->removeItem(3);
+}
+
 void SurakartaAgentSettingWidget::OnAgentTypeChanged(int index) {
     if (index == 0 || index == 2) {
         ui->label_2->setVisible(true);

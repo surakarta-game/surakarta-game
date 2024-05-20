@@ -20,6 +20,7 @@ SurakartaSessionWindow::SurakartaSessionWindow(
     // set up UI
     ui->setupUi(this);
     ui->surakarta_board->LoadN(BOARD_SIZE);
+    ui->ai_helper_setting->DisableRemote();
 
     // set up event handlers
 
