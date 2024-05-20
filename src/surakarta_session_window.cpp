@@ -150,6 +150,7 @@ void SurakartaSessionWindow::OnAiSuggestionButtonClicked() {
 void SurakartaSessionWindow::OnAgentCreated() {
     ui->surakarta_board->ReloadPieces(handler_->CopyMyPieces(), handler_->CopyOpponentPieces());
     UpdateInfo();
+    StartTimer();
 }
 
 void SurakartaSessionWindow::OnWaitingForMove() {
