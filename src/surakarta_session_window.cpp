@@ -5,8 +5,6 @@
 #include <thread>
 #include "ui_surakarta_session_window.h"
 
-#include "surakarta_board_widget.h"
-
 SurakartaSessionWindow::SurakartaSessionWindow(
     std::shared_ptr<SurakartaAgentInteractiveHandler> handler,
     std::unique_ptr<SurakartaDaemonThread> daemon_thread,
