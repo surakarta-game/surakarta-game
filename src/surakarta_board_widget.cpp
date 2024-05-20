@@ -17,10 +17,7 @@ SurakartaBoardWidget::SurakartaBoardWidget(
     std::function<std::unique_ptr<std::vector<SurakartaPositionWithId>>()> white_pieces_getter)
     : QWidget(parent),
       black_pieces_getter_(black_pieces_getter),
-      white_pieces_getter_(white_pieces_getter)
-
-      {
-
+      white_pieces_getter_(white_pieces_getter) {
     QPalette pal = palette();
     pal.setColor(QPalette::Window, QColor(0xEA, 0xD7, 0xAF));
     setAutoFillBackground(true);
