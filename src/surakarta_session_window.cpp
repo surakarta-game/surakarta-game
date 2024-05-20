@@ -2,24 +2,29 @@
 #include <QCloseEvent>
 #include <QMessageBox>
 #include <QThreadPool>
+#include <QTimer>
 #include <thread>
 #include "ui_surakarta_session_window.h"
 
 SurakartaSessionWindow::SurakartaSessionWindow(
     std::shared_ptr<SurakartaAgentInteractiveHandler> handler,
     std::unique_ptr<SurakartaDaemonThread> daemon_thread,
+    int max_time,
     QWidget* parent)
     : QWidget(parent),
       ui(new Ui::SurakartaSessionWindow),
       handler_(handler),
       Manual("./manual.txt"),
-      daemon_thread_(std::move(daemon_thread)) {
+      daemon_thread_(std::move(daemon_thread)),
+      max_time(max_time) {
     // set up UI
     ui->setupUi(this);
     ui->surakarta_board->LoadN(BOARD_SIZE);
 
     // set up event handlers
 
+    // time
+    connect(timer, &QTimer::timeout, this, &SurakartaSessionWindow::UpdateTime);
     // ui events
     connect(ui->surakarta_board, &SurakartaBoardWidget::onBoardClicked, this, &SurakartaSessionWindow::OnBoardClicked);
     connect(ui->commitButton, &QPushButton::clicked, this, &SurakartaSessionWindow::OnCommitButtonClicked);
@@ -146,6 +151,7 @@ void SurakartaSessionWindow::OnAiSuggestionButtonClicked() {
 void SurakartaSessionWindow::OnAgentCreated() {
     ui->surakarta_board->ReloadPieces(handler_->CopyMyPieces(), handler_->CopyOpponentPieces());
     UpdateInfo();
+    StartTimer();
 }
 
 void SurakartaSessionWindow::OnWaitingForMove() {
@@ -182,8 +188,29 @@ void SurakartaSessionWindow::WriteManual(SurakartaMoveTrace trace) {
         qDebug() << "Failed to open file for writing.";
     }
 }
+void SurakartaSessionWindow::StartTimer() {
+    r_time = max_time;
+    ui->remaining_time->display(r_time);
+    timer->start(1000);
+}
+
+void SurakartaSessionWindow::UpdateTime() {
+    if (r_time > 0) {
+        r_time--;
+        ui->remaining_time->display(r_time);
+    } else {
+        timer->stop();
+        onTimeout();
+    }
+}
+
+void SurakartaSessionWindow::onTimeout() {
+    // 游戏结束
+    // 弹窗，两种，需判断自己或对手，判断输赢
+}
 
 void SurakartaSessionWindow::OnMoveCommitted(SurakartaMoveTrace trace) {
+    StartTimer();
     ui->surakarta_board->OnMoveCommitted(trace);
     UpdateInfo();
     WriteManual(trace);
