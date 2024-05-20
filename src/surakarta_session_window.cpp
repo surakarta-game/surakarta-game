@@ -2,8 +2,8 @@
 #include <QCloseEvent>
 #include <QMessageBox>
 #include <QThreadPool>
-#include <thread>
 #include <QTimer>
+#include <thread>
 #include "ui_surakarta_session_window.h"
 
 SurakartaSessionWindow::SurakartaSessionWindow(
@@ -22,7 +22,7 @@ SurakartaSessionWindow::SurakartaSessionWindow(
 
     // set up event handlers
 
-    //time
+    // time
     connect(timer, &QTimer::timeout, this, &SurakartaSessionWindow::UpdateTime);
     // ui events
     connect(ui->surakarta_board, &SurakartaBoardWidget::onBoardClicked, this, &SurakartaSessionWindow::OnBoardClicked);
@@ -160,27 +160,24 @@ void SurakartaSessionWindow::OnWaitingForMove() {
     }
 }
 void SurakartaSessionWindow::StartTimer() {
-    r_time=max_time;
+    r_time = max_time;
     ui->remaining_time->display(r_time);
     timer->start(1000);
 }
 
 void SurakartaSessionWindow::UpdateTime() {
-    if(r_time>0)
-    {
+    if (r_time > 0) {
         r_time--;
         ui->remaining_time->display(r_time);
-    }
-    else
-    {
+    } else {
         timer->stop();
         onTimeout();
     }
 }
 
 void SurakartaSessionWindow::onTimeout() {
-    //游戏结束
-    //弹窗，两种，需判断自己或对手，判断输赢
+    // 游戏结束
+    // 弹窗，两种，需判断自己或对手，判断输赢
 }
 
 void SurakartaSessionWindow::OnMoveCommitted(SurakartaMoveTrace trace) {

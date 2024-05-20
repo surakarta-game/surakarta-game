@@ -1,10 +1,10 @@
 #pragma once
 
+#include <QTimer>
 #include <QWidget>
 #include <queue>
 #include "surakarta.h"
 #include "surakarta_daemon_thread.h"
-#include <QTimer>
 
 namespace Ui {
 class SurakartaSessionWindow;
@@ -30,7 +30,7 @@ class SurakartaSessionWindow : public QWidget {
     std::shared_ptr<SurakartaAgentInteractiveHandler> handler_;
     std::unique_ptr<SurakartaDaemonThread> daemon_thread_;
     void closeEvent(QCloseEvent* event) override;
-    QTimer *timer = new QTimer(this);
+    QTimer* timer = new QTimer(this);
     int max_time;
     int r_time;
 
