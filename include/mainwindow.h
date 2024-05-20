@@ -26,6 +26,7 @@ class MainWindow : public QMainWindow {
                                                                    // deleteing old session window may cause crash
     QTimer* timer;
     int circle_time = 1000;
+    int max_time = 15000;
 
    private slots:
     void StartSession();

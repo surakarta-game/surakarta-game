@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QTimer>
 #include <QWidget>
 #include <queue>
 #include "surakarta.h"
@@ -16,6 +17,7 @@ class SurakartaSessionWindow : public QWidget {
     explicit SurakartaSessionWindow(
         std::shared_ptr<SurakartaAgentInteractiveHandler> handler,
         std::unique_ptr<SurakartaDaemonThread> daemon_thread,
+        int max_time,
         QWidget* parent = nullptr);
     ~SurakartaSessionWindow();
 
@@ -28,6 +30,9 @@ class SurakartaSessionWindow : public QWidget {
     std::shared_ptr<SurakartaAgentInteractiveHandler> handler_;
     std::unique_ptr<SurakartaDaemonThread> daemon_thread_;
     void closeEvent(QCloseEvent* event) override;
+    QTimer* timer = new QTimer(this);
+    int max_time;
+    int r_time;
 
    signals:
     // emulation signals are connected to the corresponding slots
@@ -41,6 +46,20 @@ class SurakartaSessionWindow : public QWidget {
     void onMoveCommitted(SurakartaMoveTrace trace);
 
    private slots:
+    void StartTimer();
+    void onTimeout();
+    void UpdateTime();
+    // {
+    //     if (r_time > 0) {
+    //         std::cout << "Countdown: " << r_time << std::endl;
+    //         r_time--;
+    //     }
+    //     else {
+    //         timer->stop();
+    //         std::cout << "Time's up!" << std::endl;
+    //         // 这里可以添加倒计时结束时需要执行的代码
+    //     }
+    // }
     void OnBoardClicked(int x, int y);
     void OnCommitButtonClicked();
     void OnAiSuggestionButtonClicked();
