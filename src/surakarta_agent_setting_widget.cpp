@@ -75,8 +75,35 @@ std::optional<std::unique_ptr<SurakartaDaemon::AgentFactory>> SurakartaAgentSett
 
 void SurakartaAgentSettingWidget::OnAgentTypeChanged(int index) {
     if (index == 0 || index == 2) {
+        ui->label_2->setVisible(true);
+        ui->lineEdit->setVisible(true);
         ui->lineEdit->setEnabled(true);
     } else {
+        ui->label_2->setVisible(false);
+        ui->lineEdit->setVisible(false);
         ui->lineEdit->setEnabled(false);
+    }
+    if (index == 3) {
+        ui->label_server_address->setVisible(true);
+        ui->lineEdit_server_address->setVisible(true);
+        ui->label_port->setVisible(true);
+        ui->lineEdit_port->setVisible(true);
+        ui->label_color_request->setVisible(true);
+        ui->comboBox_color_request->setVisible(true);
+        ui->label_room->setVisible(true);
+        ui->lineEdit_room->setVisible(true);
+        ui->label_username->setVisible(true);
+        ui->lineEdit_username->setVisible(true);
+    } else {
+        ui->label_server_address->setVisible(false);
+        ui->lineEdit_server_address->setVisible(false);
+        ui->label_port->setVisible(false);
+        ui->lineEdit_port->setVisible(false);
+        ui->label_color_request->setVisible(false);
+        ui->comboBox_color_request->setVisible(false);
+        ui->label_room->setVisible(false);
+        ui->lineEdit_room->setVisible(false);
+        ui->label_username->setVisible(false);
+        ui->lineEdit_username->setVisible(false);
     }
 }
