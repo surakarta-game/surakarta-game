@@ -73,11 +73,11 @@ class SurakartaBoardWidget : public QWidget {
     int animation_milliseconds = 1000;
 
     bool is_piece_selected = false;
-    int selected_piece_x = 0;
-    int selected_piece_y = 0;
+    int selected_piece_x;
+    int selected_piece_y;
     bool is_destination_selected = false;
-    int selected_destination_x = 0;
-    int selected_destination_y = 0;
+    int selected_destination_x;
+    int selected_destination_y;
 
     std::function<std::unique_ptr<std::vector<SurakartaPositionWithId>>()> black_pieces_getter_;
     std::function<std::unique_ptr<std::vector<SurakartaPositionWithId>>()> white_pieces_getter_;
