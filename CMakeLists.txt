@@ -56,7 +56,16 @@ endif()
 # use libsurakarta:
 include_directories(third-party/surakarta-core/include)
 add_subdirectory(third-party/surakarta-core ${CMAKE_BINARY_DIR}/third-party/surakarta-core/src)
-target_link_libraries(surakarta-game PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Core surakarta)
+
+# use libsurakarta-network:
+add_subdirectory(third-party/surakarta-network ${CMAKE_BINARY_DIR}/third-party/surakarta-network/src)
+
+target_link_libraries(surakarta-game PRIVATE
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::Core
+    surakarta
+    surakarta-network
+)
 
 set_target_properties(surakarta-game PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
