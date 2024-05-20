@@ -1,6 +1,8 @@
 #pragma once
+#include <QMessageBox>
 #include <QWidget>
 #include <optional>
+#include <thread>
 #include "surakarta_daemon.h"
 
 namespace Ui {
@@ -18,7 +20,17 @@ class SurakartaAgentSettingWidget : public QWidget {
 
    private:
     Ui::SurakartaAgentSettingWidget* ui;
+    std::unique_ptr<SurakartaDaemon::AgentFactory> remote_agent_factory;
+    std::unique_ptr<QMessageBox> connect_message_box;
+    std::unique_ptr<std::thread> connect_thread;
+
+   signals:
+    void onConnectionSuccess();
+    void onConnectionFailed(QString message);
 
    private slots:
     void OnAgentTypeChanged(int index);
+    void OnConnectButtonClicked();
+    void OnConnectionSuccess();
+    void OnConnectionFailed(QString message);
 };
