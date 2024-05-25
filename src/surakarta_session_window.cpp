@@ -30,8 +30,12 @@ SurakartaSessionWindow::SurakartaSessionWindow(
     connect(ui->commitButton, &QPushButton::clicked, this, &SurakartaSessionWindow::OnCommitButtonClicked);
     connect(ui->ai_suggest_button, &QPushButton::clicked, this, &SurakartaSessionWindow::OnAiSuggestionButtonClicked);
     ui->surakarta_board->UsePieceUpdater(
-        [&]() { return handler_->CopyMyPieces(); },
-        [&]() { return handler_->CopyOpponentPieces(); });
+        [&]() {
+            return handler_->MyColor() == PieceColor::BLACK ? handler_->CopyMyPieces() : handler_->CopyOpponentPieces();
+        },
+        [&]() {
+            return handler_->MyColor() == PieceColor::BLACK ? handler_->CopyOpponentPieces() : handler_->CopyMyPieces();
+        });
 
     // emulation events
     connect(this, &SurakartaSessionWindow::emulateBoardClicked, this, &SurakartaSessionWindow::OnBoardClicked);
@@ -149,7 +153,9 @@ void SurakartaSessionWindow::OnAiSuggestionButtonClicked() {
 }
 
 void SurakartaSessionWindow::OnAgentCreated() {
-    ui->surakarta_board->ReloadPieces(handler_->CopyMyPieces(), handler_->CopyOpponentPieces());
+    ui->surakarta_board->ReloadPieces(
+        handler_->MyColor() == PieceColor::BLACK ? handler_->CopyMyPieces() : handler_->CopyOpponentPieces(),
+        handler_->MyColor() == PieceColor::BLACK ? handler_->CopyOpponentPieces() : handler_->CopyMyPieces());
     UpdateInfo();
     StartTimer();
 }
