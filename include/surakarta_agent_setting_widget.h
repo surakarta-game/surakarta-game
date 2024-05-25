@@ -4,6 +4,7 @@
 #include <optional>
 #include <thread>
 #include "surakarta_daemon.h"
+#include "surakarta_agent_remote.h"
 
 namespace Ui {
 class SurakartaAgentSettingWidget;
@@ -16,11 +17,12 @@ class SurakartaAgentSettingWidget : public QWidget {
     explicit SurakartaAgentSettingWidget(QWidget* parent = nullptr);
     ~SurakartaAgentSettingWidget();
     std::optional<std::unique_ptr<SurakartaDaemon::AgentFactory>> CreateAgentFactory();
+    PieceColor GetPieceColorRistriction() const;  // returns none if no restriction
     void DisableRemote();
 
    private:
     Ui::SurakartaAgentSettingWidget* ui;
-    std::unique_ptr<SurakartaDaemon::AgentFactory> remote_agent_factory;
+    std::unique_ptr<SurakartaAgentRemoteFactory> remote_agent_factory;
     std::unique_ptr<QMessageBox> connect_message_box;
     std::unique_ptr<std::thread> connect_thread;
 

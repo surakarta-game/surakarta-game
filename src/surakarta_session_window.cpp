@@ -90,8 +90,10 @@ void SurakartaSessionWindow::UpdateInfo() {
     }
     if (handler_->IsMyTurn()) {
         ui->currentEdit->setText("You");
+        ui->ai_suggest_button->setEnabled(true);
     } else {
         ui->currentEdit->setText("Opponent");
+        ui->ai_suggest_button->setEnabled(false);
     }
     if (handler_->CanCommitMove()) {
         ui->commitButton->setEnabled(true);

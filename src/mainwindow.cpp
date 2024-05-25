@@ -61,6 +61,7 @@ void MainWindow::OnTimerTimeout() {
 }
 
 void MainWindow::StartSession() {
+    const auto color_ristriction = ui->agent_setting->GetPieceColorRistriction();
     auto ai_agent_factory_opt = ui->agent_setting->CreateAgentFactory();
     if (!ai_agent_factory_opt.has_value()) {
         QMessageBox::warning(this, "Error", "Invalid agent setting");
@@ -69,8 +70,15 @@ void MainWindow::StartSession() {
     const auto handler = std::make_shared<SurakartaAgentInteractiveHandler>();
     handler->BlockAgentCreation();
     const auto my_agent_factory = handler->GetAgentFactory();
-    auto daemon = std::make_unique<SurakartaDaemonThread>(
-        std::make_unique<SurakartaDaemon>(BOARD_SIZE, MAX_NO_CAPTURE_ROUND, std::move(ai_agent_factory_opt.value()), my_agent_factory));
+    // Todo: add a setting to choose the color of the player
+    PieceColor my_color = color_ristriction == PieceColor::NONE
+                              ? (PieceColor)(GlobalRandomGenerator::getInstance()() % 2 == 0 ? PieceColor::BLACK : PieceColor::WHITE)
+                              : color_ristriction;
+    auto daemon = my_color == PieceColor::BLACK
+                      ? std::make_unique<SurakartaDaemonThread>(
+                            std::make_unique<SurakartaDaemon>(BOARD_SIZE, MAX_NO_CAPTURE_ROUND, my_agent_factory, std::move(ai_agent_factory_opt.value())))
+                      : std::make_unique<SurakartaDaemonThread>(
+                            std::make_unique<SurakartaDaemon>(BOARD_SIZE, MAX_NO_CAPTURE_ROUND, std::move(ai_agent_factory_opt.value()), my_agent_factory));
     daemon->start();
     sessionWindow = std::make_unique<SurakartaSessionWindow>(handler, std::move(daemon), 15);
     sessionWindow->show();

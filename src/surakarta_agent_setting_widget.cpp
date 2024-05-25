@@ -84,6 +84,14 @@ std::optional<std::unique_ptr<SurakartaDaemon::AgentFactory>> SurakartaAgentSett
     }
 }
 
+PieceColor SurakartaAgentSettingWidget::GetPieceColorRistriction() const {
+    if (ui->comboBox->currentIndex() == 3 && remote_agent_factory) {
+        return remote_agent_factory->AssignedColor();
+    } else {
+        return PieceColor::NONE;
+    }
+}
+
 void SurakartaAgentSettingWidget::DisableRemote() {
     ui->comboBox->removeItem(3);
 }
@@ -92,7 +100,7 @@ void SurakartaAgentSettingWidget::OnConnectButtonClicked() {
     ui->pushButton_connect->setEnabled(false);
     connect_message_box = std::make_unique<QMessageBox>(this);
     connect_message_box->setWindowTitle("Connect to Server");
-    connect_message_box->setText("Connecting...");
+    connect_message_box->setText("Connecting and waiting for peer...");
     connect_message_box->show();
     if (connect_thread)
         connect_thread->join();
