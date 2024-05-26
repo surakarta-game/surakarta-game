@@ -84,8 +84,19 @@ void SurakartaSessionWindow::UpdateInfo() {
     const auto piece = handler_->SelectedPiece();
     if (piece.id != -1) {
         ui->surakarta_board->SelectPiece(piece.x, piece.y);
+        auto posible_destinations = std::vector<SurakartaPosition>();
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                if (handler_->CanSelectDestination(SurakartaPosition(i, j))) {
+                    posible_destinations.push_back(SurakartaPosition(i, j));
+                }
+            }
+        }
+        ui->surakarta_board->LoadPossibleDestinations(posible_destinations);
     } else {
         ui->surakarta_board->UnselectPiece();
+        auto posible_destinations = std::vector<SurakartaPosition>();
+        ui->surakarta_board->LoadPossibleDestinations(posible_destinations);
     }
     const auto destination = handler_->SelectedDestination();
     if (destination.has_value()) {
