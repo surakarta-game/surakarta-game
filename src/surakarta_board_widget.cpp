@@ -115,6 +115,11 @@ void SurakartaBoardWidget::UnselectDestination() {
     update();
 }
 
+void SurakartaBoardWidget::LoadPossibleDestinations(const std::vector<SurakartaPosition>& positions) {
+    possible_destinations = positions;
+    update();
+}
+
 SurakartaBoardWidget::~SurakartaBoardWidget() {
 }
 
@@ -145,6 +150,14 @@ void SurakartaBoardWidget::paintEvent(QPaintEvent* event) {
             //     printf("white out of bound: %f, %f\n", piece.x, piece.y);
             PaintWhitePiece(piece.x, piece.y);
         }
+    }
+    for (int i = 0; i < possible_destinations.size(); i++) {
+        const auto pos = possible_destinations[i];
+        if (pos.x < 0 || pos.x >= n_board_ || pos.y < 0 || pos.y >= n_board_) {
+            QMessageBox::warning(this, "Error", "Invalid position.");
+            return;
+        }
+        PaintPossibleDestination(pos.x, pos.y);
     }
     if (is_piece_selected) {
         PaintSelection(selected_piece_x, selected_piece_y);
@@ -196,6 +209,26 @@ void SurakartaBoardWidget::PaintSelection(int x, int y) {
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
     painter.setBrush(Qt::red);
+    painter.setPen(Qt::NoPen);
+    painter.drawRect(rect_corner + x * gap_ - 4 * pixel, rect_corner + y * gap_ - 4 * pixel, 2 * pixel, 1 * pixel);
+    painter.drawRect(rect_corner + x * gap_ - 4 * pixel, rect_corner + y * gap_ - 3 * pixel, 1 * pixel, 1 * pixel);
+    painter.drawRect(rect_corner + x * gap_ + 2 * pixel, rect_corner + y * gap_ - 4 * pixel, 2 * pixel, 1 * pixel);
+    painter.drawRect(rect_corner + x * gap_ + 3 * pixel, rect_corner + y * gap_ - 3 * pixel, 1 * pixel, 1 * pixel);
+    painter.drawRect(rect_corner + x * gap_ - 4 * pixel, rect_corner + y * gap_ + 2 * pixel, 1 * pixel, 2 * pixel);
+    painter.drawRect(rect_corner + x * gap_ - 3 * pixel, rect_corner + y * gap_ + 3 * pixel, 1 * pixel, 1 * pixel);
+    painter.drawRect(rect_corner + x * gap_ + 3 * pixel, rect_corner + y * gap_ + 2 * pixel, 1 * pixel, 2 * pixel);
+    painter.drawRect(rect_corner + x * gap_ + 2 * pixel, rect_corner + y * gap_ + 3 * pixel, 1 * pixel, 1 * pixel);
+}
+
+void SurakartaBoardWidget::PaintPossibleDestination(int x, int y) {
+    if (x < 0 || x >= n_board_ || y < 0 || y >= n_board_) {
+        QMessageBox::warning(this, "Error", "Invalid position.");
+        return;
+    }
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+    painter.setBrush(Qt::gray);
     painter.setPen(Qt::NoPen);
     painter.drawRect(rect_corner + x * gap_ - 4 * pixel, rect_corner + y * gap_ - 4 * pixel, 2 * pixel, 1 * pixel);
     painter.drawRect(rect_corner + x * gap_ - 4 * pixel, rect_corner + y * gap_ - 3 * pixel, 1 * pixel, 1 * pixel);
