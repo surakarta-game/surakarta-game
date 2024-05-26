@@ -46,7 +46,8 @@ SurakartaAgentSettingWidget::SurakartaAgentSettingWidget(QWidget* parent)
 }
 
 SurakartaAgentSettingWidget::~SurakartaAgentSettingWidget() {
-    connect_thread->join();
+    if (connect_thread && connect_thread->joinable())
+        connect_thread->join();
     delete ui;
 }
 
