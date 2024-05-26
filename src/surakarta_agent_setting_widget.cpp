@@ -86,10 +86,17 @@ std::optional<std::unique_ptr<SurakartaDaemon::AgentFactory>> SurakartaAgentSett
 }
 
 PieceColor SurakartaAgentSettingWidget::GetPieceColorRistriction() const {
-    if (ui->comboBox->currentIndex() == 3 && remote_agent_factory) {
-        return remote_agent_factory->AssignedColor();
+    if (ui->comboBox->currentIndex() == 3) {
+        if (remote_agent_factory)
+            return remote_agent_factory->AssignedColor();
+        else
+            return PieceColor::UNKNOWN;
     } else {
-        return PieceColor::NONE;
+        return ui->comboBox_color_request->currentIndex() == 1
+                   ? PieceColor::BLACK
+               : ui->comboBox_color_request->currentIndex() == 2
+                   ? PieceColor::WHITE
+                   : PieceColor::NONE;
     }
 }
 
@@ -170,8 +177,6 @@ void SurakartaAgentSettingWidget::OnAgentTypeChanged(int index) {
         ui->lineEdit_server_address->setVisible(true);
         ui->label_port->setVisible(true);
         ui->lineEdit_port->setVisible(true);
-        ui->label_color_request->setVisible(true);
-        ui->comboBox_color_request->setVisible(true);
         ui->label_room->setVisible(true);
         ui->lineEdit_room->setVisible(true);
         ui->label_username->setVisible(true);
@@ -182,8 +187,6 @@ void SurakartaAgentSettingWidget::OnAgentTypeChanged(int index) {
         ui->lineEdit_server_address->setVisible(false);
         ui->label_port->setVisible(false);
         ui->lineEdit_port->setVisible(false);
-        ui->label_color_request->setVisible(false);
-        ui->comboBox_color_request->setVisible(false);
         ui->label_room->setVisible(false);
         ui->lineEdit_room->setVisible(false);
         ui->label_username->setVisible(false);

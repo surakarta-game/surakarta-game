@@ -75,7 +75,7 @@ void MainWindow::StartSession() {
     const auto my_agent_factory = handler->GetAgentFactory();
     // Todo: add a setting to choose the color of the player
     PieceColor my_color = color_ristriction == PieceColor::NONE
-                              ? (PieceColor)(GlobalRandomGenerator::getInstance()() % 2 == 0 ? PieceColor::BLACK : PieceColor::WHITE)
+                              ? (GlobalRandomGenerator::getInstance()() % 2 == 0 ? PieceColor::BLACK : PieceColor::WHITE)
                               : color_ristriction;
     auto daemon = my_color == PieceColor::BLACK
                       ? std::make_unique<SurakartaDaemonThread>(
