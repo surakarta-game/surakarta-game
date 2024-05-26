@@ -23,11 +23,13 @@ set(PROJECT_SOURCES
         include/surakarta_board_widget.h
         include/surakarta_daemon_thread.h
         include/surakarta_agent_setting_widget.h
+        include/surakarta_game_browser_window.h
         src/main.cpp
         src/mainwindow.cpp
         src/surakarta_session_window.cpp
         src/surakarta_board_widget.cpp
         src/surakarta_agent_setting_widget.cpp
+        src/surakarta_game_browser_window.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
