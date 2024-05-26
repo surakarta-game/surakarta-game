@@ -104,6 +104,11 @@ void SurakartaAgentSettingWidget::DisableRemote() {
     ui->comboBox->removeItem(3);
 }
 
+void SurakartaAgentSettingWidget::DisableColor() {
+    ui->label_color_request->setVisible(false);
+    ui->comboBox_color_request->setVisible(false);
+}
+
 void SurakartaAgentSettingWidget::OnConnectButtonClicked() {
     ui->pushButton_connect->setEnabled(false);
     connect_message_box = std::make_unique<QMessageBox>(this);

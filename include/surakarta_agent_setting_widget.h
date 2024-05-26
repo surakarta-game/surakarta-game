@@ -19,6 +19,7 @@ class SurakartaAgentSettingWidget : public QWidget {
     std::optional<std::unique_ptr<SurakartaDaemon::AgentFactory>> CreateAgentFactory();
     PieceColor GetPieceColorRistriction() const;  // returns none if no restriction
     void DisableRemote();
+    void DisableColor();
 
    private:
     Ui::SurakartaAgentSettingWidget* ui;
