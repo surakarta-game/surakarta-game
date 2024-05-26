@@ -60,6 +60,11 @@ SurakartaSessionWindow::SurakartaSessionWindow(
     });
     connect(this, &SurakartaSessionWindow::onMoveCommitted, this, &SurakartaSessionWindow::OnMoveCommitted);
 
+    handler_->OnGameEnded.AddListener([&](SurakartaMoveResponse response) {
+        onGameEnded(response);
+    });
+    connect(this, &SurakartaSessionWindow::onGameEnded, this, &SurakartaSessionWindow::OnGameEnded);
+
     // Allow agent creation
     handler_->UnblockAgentCreation();
 }
@@ -223,4 +228,25 @@ void SurakartaSessionWindow::OnMoveCommitted(SurakartaMoveTrace trace) {
     ui->surakarta_board->OnMoveCommitted(trace);
     UpdateInfo();
     WriteManual(trace);
+}
+
+void SurakartaSessionWindow::OnGameEnded(SurakartaMoveResponse response) {
+    timer->stop();
+    QMessageBox msgBox;
+    if (response.GetWinner() == PieceColor::NONE) {
+        msgBox.setWindowTitle("Stalemate");
+    } else {
+        msgBox.setWindowTitle(response.GetWinner() == handler_->MyColor() ? "You Win" : "You Lose");
+    }
+    auto color_str = std::string("Your color: ") + (handler_->MyColor() == PieceColor::BLACK ? "Black" : "White");
+    auto winner_str = std::string("Winner: ") + (response.GetWinner() == PieceColor::NONE
+                                                     ? "Stalemate"
+                                                     : (response.GetWinner() == PieceColor::BLACK ? "Black" : "White"));
+    auto end_reason_str = std::string("End reason: ") + SurakartaToString(response.GetEndReason());
+    auto last_move_str = std::string("Last move type: ") + SurakartaToString(response.GetMoveReason());
+    auto game_info = handler_->CopyGameInfo();
+    auto total_move_str = std::string("Total moves: ") + std::to_string(game_info.num_round_);
+    msgBox.setText(QString::fromStdString(color_str + "\n" + winner_str + "\n" + end_reason_str + "\n" + last_move_str + "\n" + total_move_str));
+    msgBox.exec();
+    close();
 }
