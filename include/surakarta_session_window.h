@@ -39,7 +39,7 @@ class SurakartaSessionWindow : public QWidget {
     int max_time;
     int r_time;
     void WriteManual(SurakartaMoveTrace trace);
-    QFile Manual;
+    QString manual;
 
    signals:
     // emulation signals are connected to the corresponding slots
@@ -51,6 +51,7 @@ class SurakartaSessionWindow : public QWidget {
     void onAgentCreated();
     void onWaitingForMove();
     void onMoveCommitted(SurakartaMoveTrace trace);
+    void onGameEnded(SurakartaMoveResponse response);
 
    private slots:
     void StartTimer();
@@ -74,4 +75,5 @@ class SurakartaSessionWindow : public QWidget {
     void OnAgentCreated();
     void OnWaitingForMove();
     void OnMoveCommitted(SurakartaMoveTrace trace);
+    void OnGameEnded(SurakartaMoveResponse response);
 };

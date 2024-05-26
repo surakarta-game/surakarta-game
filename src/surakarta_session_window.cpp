@@ -1,5 +1,6 @@
 #include "surakarta_session_window.h"
 #include <QCloseEvent>
+#include <QFileDialog>
 #include <QMessageBox>
 #include <QThreadPool>
 #include <QTimer>
@@ -14,7 +15,6 @@ SurakartaSessionWindow::SurakartaSessionWindow(
     : QWidget(parent),
       ui(new Ui::SurakartaSessionWindow),
       handler_(handler),
-      Manual("./manual.txt"),
       daemon_thread_(std::move(daemon_thread)),
       max_time(max_time) {
     // set up UI
@@ -59,6 +59,11 @@ SurakartaSessionWindow::SurakartaSessionWindow(
         onMoveCommitted(trace);
     });
     connect(this, &SurakartaSessionWindow::onMoveCommitted, this, &SurakartaSessionWindow::OnMoveCommitted);
+
+    handler_->OnGameEnded.AddListener([&](SurakartaMoveResponse response) {
+        onGameEnded(response);
+    });
+    connect(this, &SurakartaSessionWindow::onGameEnded, this, &SurakartaSessionWindow::OnGameEnded);
 
     // Allow agent creation
     handler_->UnblockAgentCreation();
@@ -184,18 +189,7 @@ void SurakartaSessionWindow::WriteManual(SurakartaMoveTrace trace) {
                              .arg(trace.path[0].From().y + 1)
                              .arg(numToLetter(trace.path[trace.path.size() - 1].To().x))
                              .arg(trace.path[trace.path.size() - 1].To().y + 1);
-    //* choose which file to write according to the piece color
-    // SurakartaPosition p(trace.path[trace.path.size() - 1].To().x, trace.path[trace.path.size() - 1].To().y);
-    // QFile* manualFile = (ui->surakarta_board->GetColorOfPosition(trace.path[trace.path.size() - 1].To().x,trace.path[trace.path.size() - 1].To().y) == PieceColor::BLACK) ? &Black_Manual : &White_Manual;
-    QFile* m = &Manual;
-    //* open and write
-    if (Manual.open(QIODevice::Append | QIODevice::Text)) {
-        QTextStream out(m);
-        out << moveRecord;
-        Manual.close();  //! dont forget to close the file
-    } else {
-        qDebug() << "Failed to open file for writing.";
-    }
+    manual.append(moveRecord);
 }
 void SurakartaSessionWindow::StartTimer() {
     r_time = max_time;
@@ -223,4 +217,41 @@ void SurakartaSessionWindow::OnMoveCommitted(SurakartaMoveTrace trace) {
     ui->surakarta_board->OnMoveCommitted(trace);
     UpdateInfo();
     WriteManual(trace);
+}
+
+void SurakartaSessionWindow::OnGameEnded(SurakartaMoveResponse response) {
+    timer->stop();
+    manual.append(SurakartaToString(response.GetEndReason())[0]);
+    manual.append('#');
+    QMessageBox msgBox;
+    if (response.GetWinner() == PieceColor::NONE) {
+        msgBox.setWindowTitle("Stalemate");
+    } else {
+        msgBox.setWindowTitle(response.GetWinner() == handler_->MyColor() ? "You Win" : "You Lose");
+    }
+    auto color_str = std::string("Your color: ") + (handler_->MyColor() == PieceColor::BLACK ? "Black" : "White");
+    auto winner_str = std::string("Winner: ") + (response.GetWinner() == PieceColor::NONE
+                                                     ? "Stalemate"
+                                                     : (response.GetWinner() == PieceColor::BLACK ? "Black" : "White"));
+    auto end_reason_str = std::string("End reason: ") + SurakartaToString(response.GetEndReason());
+    auto last_move_str = std::string("Last move type: ") + SurakartaToString(response.GetMoveReason());
+    auto game_info = handler_->CopyGameInfo();
+    auto total_move_str = std::string("Total moves: ") + std::to_string(game_info.num_round_);
+    msgBox.setText(QString::fromStdString(color_str + "\n" + winner_str + "\n" + end_reason_str + "\n" + last_move_str + "\n" + total_move_str));
+    QPushButton saveButton("Save");
+    QPushButton closeButton("Close");
+    msgBox.addButton(&saveButton, QMessageBox::ActionRole);
+    msgBox.addButton(&closeButton, QMessageBox::AcceptRole);
+    connect(&saveButton, &QPushButton::clicked, [=]() {
+        QString fileName = QFileDialog::getSaveFileName(this, tr("Save Manual"), "", tr("Text Files (*.txt)"));
+        QFile file(fileName);
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            return;
+        }
+        QTextStream out(&file);
+        out << manual;
+        file.close();
+    });
+    msgBox.exec();
+    close();
 }

@@ -10,6 +10,7 @@ int main(int argc, char* argv[]) {
 
     // Let these classes can be used in signal-slot mechanism
     qRegisterMetaType<SurakartaMoveTrace>("SurakartaMoveTrace");
+    qRegisterMetaType<SurakartaMoveResponse>("SurakartaMoveResponse");
     qRegisterMetaType<std::exception>("std::exception");
 
     MainWindow w;
