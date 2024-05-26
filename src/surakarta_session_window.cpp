@@ -244,6 +244,9 @@ void SurakartaSessionWindow::OnGameEnded(SurakartaMoveResponse response) {
     msgBox.addButton(&closeButton, QMessageBox::AcceptRole);
     connect(&saveButton, &QPushButton::clicked, [=]() {
         QString fileName = QFileDialog::getSaveFileName(this, tr("Save Manual"), "", tr("Text Files (*.txt)"));
+        if (fileName.endsWith(".txt") == false) {
+            fileName.append(".txt");
+        }
         QFile file(fileName);
         if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
             return;

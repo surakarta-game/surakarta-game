@@ -1,8 +1,10 @@
 #include "mainwindow.h"
+#include <QFileDialog>
 #include <QMessageBox>
 #include <QThreadPool>
 #include "./ui_mainwindow.h"
 #include "surakarta_daemon_thread.h"
+#include "surakarta_game_browser_window.h"
 #include "surakarta_session_window.h"
 
 MainWindow::MainWindow(QWidget* parent)
@@ -13,6 +15,7 @@ MainWindow::MainWindow(QWidget* parent)
     timer->setInterval(0);
     timer->start();
     connect(ui->playButton, &QPushButton::clicked, this, &MainWindow::StartSession);
+    connect(ui->openButton, &QPushButton::clicked, this, &MainWindow::OpenManual);
     connect(timer, &QTimer::timeout, this, &MainWindow::OnTimerTimeout);
 }
 
@@ -87,8 +90,35 @@ void MainWindow::StartSession() {
     connect(sessionWindow.get(), &SurakartaSessionWindow::closed, this, &MainWindow::OnSessionWindowClosed);
 }
 
+void MainWindow::OpenManual() {
+    QString filename = QFileDialog::getOpenFileName(this, tr("Open Manual"), "", tr("Text Files (*.txt)"));
+    if (filename.isEmpty()) {
+        return;
+    }
+    QFile file(filename);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QMessageBox::warning(this, "Error", "Cannot open file");
+        return;
+    }
+    QTextStream in(&file);
+    std::string content = in.readAll().toStdString();
+
+    browserWindow = std::make_unique<SurakartaGameBrowserWindow>(content);
+    browserWindow->show();
+    this->hide();
+    this->timer->stop();
+    connect(browserWindow.get(), &SurakartaGameBrowserWindow::closed, this, &MainWindow::OnManualWindowClosed);
+}
+
 void MainWindow::OnSessionWindowClosed() {
     garbage.push_back(std::move(sessionWindow));  // move the window object to garbage
+    this->show();
+    this->timer->setInterval(0);
+    this->timer->start();
+}
+
+void MainWindow::OnManualWindowClosed() {
+    garbage2.push_back(std::move(browserWindow));  // move the window object to garbage
     this->show();
     this->timer->setInterval(0);
     this->timer->start();
