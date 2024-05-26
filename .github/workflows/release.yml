@@ -101,6 +101,14 @@ jobs:
         mkdir ${{github.workspace}}\build\${{ env.RELEASE_NAME }}\
         cp ${{github.workspace}}/build/${{ env.EXECUTABLE_NAME }} ${{github.workspace}}\build\${{ env.RELEASE_NAME }}\
         cp ${{github.workspace}}/build/bin/libsurakarta.dll ${{github.workspace}}\build\${{ env.RELEASE_NAME }}\
+        cp ${{github.workspace}}/build/bin/libsockpp.dll ${{github.workspace}}\build\${{ env.RELEASE_NAME }}\
+        cp ${{github.workspace}}/build/bin/libnetwork-framework.dll ${{github.workspace}}\build\${{ env.RELEASE_NAME }}\
+        cp ${{github.workspace}}/build/bin/libsurakarta-network.dll ${{github.workspace}}\build\${{ env.RELEASE_NAME }}\
+        cp ${{github.workspace}}/build/bin/surakarta-benchmark.exe ${{github.workspace}}\build\${{ env.RELEASE_NAME }}\
+        cp ${{github.workspace}}/build/bin/surakarta-server.exe ${{github.workspace}}\build\${{ env.RELEASE_NAME }}\
+        cp ${{github.workspace}}/build/bin/surakarta-network-client.exe ${{github.workspace}}\build\${{ env.RELEASE_NAME }}\
+        cp ${{github.workspace}}/build/bin/surakarta-network-test.exe ${{github.workspace}}\build\${{ env.RELEASE_NAME }}\
+        cp ${{github.workspace}}/build/bin/network-framework-test.exe ${{github.workspace}}\build\${{ env.RELEASE_NAME }}\
         cd ${{github.workspace}}\build\${{ env.RELEASE_NAME }}\
         windeployqt.exe ${{ env.EXECUTABLE_NAME }} --release
         ls
