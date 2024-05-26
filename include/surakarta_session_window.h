@@ -39,7 +39,7 @@ class SurakartaSessionWindow : public QWidget {
     int max_time;
     int r_time;
     void WriteManual(SurakartaMoveTrace trace);
-    QFile Manual;
+    QString manual;
 
    signals:
     // emulation signals are connected to the corresponding slots
