@@ -1,8 +1,10 @@
 #include "mainwindow.h"
+#include <QFileDialog>
 #include <QMessageBox>
 #include <QThreadPool>
 #include "./ui_mainwindow.h"
 #include "surakarta_daemon_thread.h"
+#include "surakarta_game_browser_window.h"
 #include "surakarta_session_window.h"
 
 MainWindow::MainWindow(QWidget* parent)
@@ -13,6 +15,7 @@ MainWindow::MainWindow(QWidget* parent)
     timer->setInterval(0);
     timer->start();
     connect(ui->playButton, &QPushButton::clicked, this, &MainWindow::StartSession);
+    connect(ui->openButton, &QPushButton::clicked, this, &MainWindow::OpenManual);
     connect(timer, &QTimer::timeout, this, &MainWindow::OnTimerTimeout);
 }
 
@@ -61,6 +64,7 @@ void MainWindow::OnTimerTimeout() {
 }
 
 void MainWindow::StartSession() {
+    const auto color_ristriction = ui->agent_setting->GetPieceColorRistriction();
     auto ai_agent_factory_opt = ui->agent_setting->CreateAgentFactory();
     if (!ai_agent_factory_opt.has_value()) {
         QMessageBox::warning(this, "Error", "Invalid agent setting");
@@ -69,18 +73,52 @@ void MainWindow::StartSession() {
     const auto handler = std::make_shared<SurakartaAgentInteractiveHandler>();
     handler->BlockAgentCreation();
     const auto my_agent_factory = handler->GetAgentFactory();
-    auto daemon = std::make_unique<SurakartaDaemonThread>(
-        std::make_unique<SurakartaDaemon>(BOARD_SIZE, MAX_NO_CAPTURE_ROUND, my_agent_factory, std::move(ai_agent_factory_opt.value())));
+    // Todo: add a setting to choose the color of the player
+    PieceColor my_color = color_ristriction == PieceColor::NONE
+                              ? (GlobalRandomGenerator::getInstance()() % 2 == 0 ? PieceColor::BLACK : PieceColor::WHITE)
+                              : color_ristriction;
+    auto daemon = my_color == PieceColor::BLACK
+                      ? std::make_unique<SurakartaDaemonThread>(
+                            std::make_unique<SurakartaDaemon>(BOARD_SIZE, MAX_NO_CAPTURE_ROUND, my_agent_factory, std::move(ai_agent_factory_opt.value())))
+                      : std::make_unique<SurakartaDaemonThread>(
+                            std::make_unique<SurakartaDaemon>(BOARD_SIZE, MAX_NO_CAPTURE_ROUND, std::move(ai_agent_factory_opt.value()), my_agent_factory));
     daemon->start();
-    sessionWindow = std::make_unique<SurakartaSessionWindow>(handler, std::move(daemon));
+    sessionWindow = std::make_unique<SurakartaSessionWindow>(handler, std::move(daemon), 15);
     sessionWindow->show();
     this->hide();
     this->timer->stop();
     connect(sessionWindow.get(), &SurakartaSessionWindow::closed, this, &MainWindow::OnSessionWindowClosed);
 }
 
+void MainWindow::OpenManual() {
+    QString filename = QFileDialog::getOpenFileName(this, tr("Open Manual"), "", tr("Text Files (*.txt)"));
+    if (filename.isEmpty()) {
+        return;
+    }
+    QFile file(filename);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QMessageBox::warning(this, "Error", "Cannot open file");
+        return;
+    }
+    QTextStream in(&file);
+    std::string content = in.readAll().toStdString();
+
+    browserWindow = std::make_unique<SurakartaGameBrowserWindow>(content);
+    browserWindow->show();
+    this->hide();
+    this->timer->stop();
+    connect(browserWindow.get(), &SurakartaGameBrowserWindow::closed, this, &MainWindow::OnManualWindowClosed);
+}
+
 void MainWindow::OnSessionWindowClosed() {
     garbage.push_back(std::move(sessionWindow));  // move the window object to garbage
+    this->show();
+    this->timer->setInterval(0);
+    this->timer->start();
+}
+
+void MainWindow::OnManualWindowClosed() {
+    garbage2.push_back(std::move(browserWindow));  // move the window object to garbage
     this->show();
     this->timer->setInterval(0);
     this->timer->start();
